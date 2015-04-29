@@ -29,8 +29,10 @@ import org.jevis.api.JEVisType;
  *
  * @author Florian Simon <florian.simon@envidatec.com>
  */
-public class ClassHelper {
 
+//@AITBilal - Primitive Type für die Attribute
+
+public class ClassHelper {
     private static final String STRING = "String";
     private static final String BOOLEAN = "Boolean";
     private static final String DOUBLE = "Double";

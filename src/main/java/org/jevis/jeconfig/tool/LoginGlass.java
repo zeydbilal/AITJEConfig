@@ -702,6 +702,9 @@ public class LoginGlass extends AnchorPane {
         serverConfigPop.setAutoFix(true);
 
         if (serverConfigurations.isEmpty()) {
+            //@AITBilal - Logindaten für AIT
+            SimpleServerConfig jevisAIT = new SimpleServerConfig(1, "JevisAIT", "localhost", "3306", "jevis", "jevis", "jevis");
+            serverConfigurations.add(jevisAIT);
             SimpleServerConfig openJEvisOrg = new SimpleServerConfig(1, "OpenJEVis.org", "openjevis.org", "13306", "jevis", "jevis", "jevistest");
             serverConfigurations.add(openJEvisOrg);
             SimpleServerConfig Coffee = new SimpleServerConfig(2, "COFFEE Project", "coffee-project.eu", "13306", "jevis", "jevis", "jevistest");

@@ -59,6 +59,7 @@ import org.jevis.jeconfig.plugin.object.attribute.StringValueEditor;
  *
  * @author Florian Simon <florian.simon@envidatec.com>
  */
+//@AITBilal - Hier werden die Attribute erstellen.
 public class GenericAttributeExtension implements ObjectEditorExtension {
 
     private static final String TITEL = "Attributes";
@@ -131,7 +132,7 @@ public class GenericAttributeExtension implements ObjectEditorExtension {
         //TODO: save
         return true;
     }
-
+    
     private void buildGui(JEVisObject obj) {
 
         _needSave = false;

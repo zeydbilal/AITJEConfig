@@ -198,6 +198,9 @@ public class ObjectPlugin implements Plugin {
                 case Constants.Plugin.Command.RELOAD:
                     tree.reload();
                     break;
+                case Constants.Plugin.Command.FORM:
+                    tree.fireEventNewForm(tree.getSelectedObject());
+                    break;
                 default:
                     System.out.println("Unknows command ignore...");
             }

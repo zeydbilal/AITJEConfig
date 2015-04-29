@@ -28,6 +28,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
+import org.jevis.jeconfig.plugin.form.FormDialog;
 import org.jevis.jeconfig.plugin.object.ObjectPlugin;
 
 /**
@@ -65,7 +66,12 @@ public class GlobalToolBar {
         changeBackgroundOnHoverUsingBinding(reload);
         addEventHandler(reload, Constants.Plugin.Command.RELOAD);
 
-        toolBar.getItems().addAll(save, newB, delete, sep1);
+        //@AITBilal - A new Form button on the ToolBar
+        ToggleButton form = new ToggleButton("", JEConfig.getImage("add_a_form.png", iconSize, iconSize));
+        changeBackgroundOnHoverUsingBinding(form);
+        addEventHandler(form,Constants.Plugin.Command.FORM);
+
+        toolBar.getItems().addAll(save, newB, delete, sep1, form);
 
         //test
         return toolBar;

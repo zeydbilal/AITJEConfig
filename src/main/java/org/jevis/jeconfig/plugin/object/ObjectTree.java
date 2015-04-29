@@ -572,6 +572,63 @@ public class ObjectTree extends TreeView<JEVisObject> {
 
     }
 
+    //@AITBilal - Erstelle ein neues Fom-Object!
+    public void fireEventNewForm(final JEVisObject parent) {
+
+        NewFormDialog dia = new NewFormDialog();
+
+        if (parent != null) {
+            if (dia.show(JEConfig.getStage(), null, parent, false, NewFormDialog.Type.NEW, null) == NewFormDialog.Response.YES) {
+                for (int i = 0; i < dia.getlistCreateName().size(); i++) {
+                    try {
+                        //TODO    
+                        String name = dia.getlistCreateName().get(i);
+                        JEVisObject newObject = parent.buildObject(name, dia.getlistCreateClasse().get(i));
+                        newObject.commit();
+                        final TreeItem<JEVisObject> newTreeItem = buildItem(newObject);
+                        TreeItem<JEVisObject> parentItem = getObjectTreeItem(parent);
+                        parentItem.getChildren().add(newTreeItem);
+
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                getSelectionModel().select(newTreeItem);
+                            }
+                        });
+                    } catch (JEVisException ex) {
+                        Logger.getLogger(ObjectTree.class.getName()).log(Level.SEVERE, null, ex);
+
+                        if (ex.getMessage().equals("Can not create User with this name. The User has to be unique on the System")) {
+                            InfoDialog info = new InfoDialog();
+                            info.show(JEConfig.getStage(), "Waring", "Could not create user", "Could not create new user because this user exists already.");
+
+                        } else {
+                            ExceptionDialog errorDia = new ExceptionDialog();
+                            errorDia.show(JEConfig.getStage(), "Error", "Could not create user", "Could not create new user.", ex, JEConfig.PROGRAMM_INFO);
+
+                        }
+
+                    }
+                }
+
+//                        String name = dia.getCreateName();
+//                        JEVisObject newObject = parent.buildObject(name, dia.getCreateClass());
+//                    newObject.commit();
+//                    final TreeItem<JEVisObject> newTreeItem = buildItem(newObject);
+//                    TreeItem<JEVisObject> parentItem = getObjectTreeItem(parent);
+//
+//                    parentItem.getChildren().add(newTreeItem);
+//                    Platform.runLater(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            getSelectionModel().select(newTreeItem);
+//                        }
+//                    });
+            }
+        }
+
+    }
+
     //TODO i dont like this way
     public ObjectEditor getEditor() {
         return _editor;

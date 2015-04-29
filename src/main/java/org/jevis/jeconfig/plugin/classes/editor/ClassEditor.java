@@ -74,6 +74,9 @@ import org.jevis.jeconfig.tool.ImageConverter;
  *
  * @author Florian Simon <florian.simon@envidatec.com>
  */
+
+// @AITBilal - Eigenschaften für eine neue JEConfig-Klasse
+
 public class ClassEditor {
 
 //    private Desktop desktop = Desktop.getDesktop();
@@ -571,7 +574,8 @@ public class ClassEditor {
 
         }
     }
-
+    
+    //AITBilal - Icon einfügen!
     private void openFile(File file) {
         try {
 //            Image image = new Image(file.toURI().toString());

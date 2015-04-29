@@ -71,6 +71,7 @@ public class PluginManager {
         _plugins.add(new ObjectPlugin(_ds, "Resources"));
         _plugins.add(new org.jevis.jeconfig.plugin.classes.ClassPlugin(_ds, "Classes"));
         _plugins.add(new org.jevis.jeconfig.plugin.unit.UnitPlugin(_ds, "Units"));
+        _plugins.add(new org.jevis.jeconfig.plugin.form.FormPlugin(_ds, "Form"));
     }
 
     public void setWatermark(boolean water) {
@@ -79,7 +80,9 @@ public class PluginManager {
 
     public Node getView() {
         StackPane box = new StackPane();
-
+        
+        //@AITBilal - TabPane für Resources,Classes und Units
+        //Alle Plugins werden hier aufgerufen!
         tabPane = new TabPane();
         tabPane.setSide(Side.LEFT);
 

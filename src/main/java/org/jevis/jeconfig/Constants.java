@@ -39,6 +39,7 @@ public interface Constants {
             public static int EXPAND = 5;
             public static int COLLAPSE = 6;
             public static int RELOAD = 7;
+            public static int FORM = 8;
         }
     }
 

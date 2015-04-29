@@ -124,6 +124,7 @@ public class JEConfig extends Application {
      *
      * @param primaryStage
      */
+    //AITBilal - Login  
     private void initGUI(Stage primaryStage) {
         Scene scene;
         LoginGlass login = new LoginGlass(primaryStage);
@@ -139,6 +140,7 @@ public class JEConfig extends Application {
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
 
+// @AITBilal - Main frame elemente wird aufgerufen nachdem man sich eingeloggt hat.
         login.getLoginStatus().addListener(new ChangeListener<Boolean>() {
 
             @Override
@@ -167,6 +169,7 @@ public class JEConfig extends Application {
                     preLodedRootObjects = login.getRootObjects();
 
                     PluginManager pMan = new PluginManager(ds);
+                    //@AITBilal - Toolbar für save, newB, delete, sep1, form
                     GlobalToolBar toolbar = new GlobalToolBar(pMan);
                     pMan.addPluginsByUserSetting(null);
 
@@ -176,6 +179,7 @@ public class JEConfig extends Application {
                     VBox vbox = new VBox();
                     vbox.getChildren().addAll(new TopMenu(), toolbar.ToolBarFactory());
                     border.setTop(vbox);
+                    //@AITBilal - Alle Plugins Inhalt für JEConfig (Resources... | System | Attribute)
                     border.setCenter(pMan.getView());
 
                     Statusbar statusBar = new Statusbar(ds);
@@ -217,7 +221,7 @@ public class JEConfig extends Application {
         AnchorPane.setRightAnchor(login, 0.0);
         AnchorPane.setLeftAnchor(login, 0.0);
         AnchorPane.setBottomAnchor(login, 0.0);
-
+        //@AITBilal - Login Dialog
         scene = new Scene(jeconfigRoot, bounds.getWidth(), bounds.getHeight());
         scene.getStylesheets().add("/styles/Styles.css");
         primaryStage.getIcons().add(getImage("1393354629_Config-Tools.png"));
@@ -229,6 +233,7 @@ public class JEConfig extends Application {
 //        Platform.runLater(new Runnable() {
 //            @Override
 //            public void run() {
+        //@AITBilal - Inhalt bzw. die Elemente von LoginDialog
         jeconfigRoot.getChildren().setAll(login);
 //            }
 //        });
@@ -245,7 +250,6 @@ public class JEConfig extends Application {
                 }
             }
         });
-
     }
 
     /**
@@ -253,6 +257,7 @@ public class JEConfig extends Application {
      *
      * @param primaryStage
      */
+    //@AITBilal - Dieses Method wird nirgendwo aufgerufen!
     private void buildGUI(Stage primaryStage) {
 
         try {
