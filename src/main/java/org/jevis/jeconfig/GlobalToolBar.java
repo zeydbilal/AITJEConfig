@@ -28,7 +28,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
-import org.jevis.jeconfig.plugin.form.FormDialog;
 import org.jevis.jeconfig.plugin.object.ObjectPlugin;
 
 /**
