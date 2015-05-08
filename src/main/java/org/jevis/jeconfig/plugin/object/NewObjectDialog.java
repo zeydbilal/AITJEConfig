@@ -21,7 +21,6 @@
 package org.jevis.jeconfig.plugin.object;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
