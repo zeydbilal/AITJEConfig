@@ -1,54 +1,95 @@
 package org.jevis.jeconfig.plugin.object;
 
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TablePosition;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
-
+import org.jevis.api.JEVisClass;
+import org.jevis.api.JEVisException;
+import org.jevis.api.JEVisObject;
+import org.jevis.jeconfig.tool.ImageConverter;
 
 /**
  *
  * @author Bilal
  */
-
 //TODO
 public class NewFormTable {
-       
+
     private final ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
     private ObservableList<SpreadsheetCell> cells;
     private ObservableList<String> listAttribute = FXCollections.observableArrayList();
     private SpreadsheetView spv;
     private GridBase grid;
-    private DataFormat fmt = new DataFormat("Text");
     private Stage stage = new Stage();
 
-    public NewFormTable(){
-        try {
-            initGUI();
-        } catch (Exception ex) {
-            Logger.getLogger(NewFormTable.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    private ObservableList<ComboBox> optionsList = FXCollections.observableArrayList();
+
+    public NewFormTable() {
+
     }
-    
-    public void initGUI() throws Exception {
+
+    public void initGUI(final JEVisObject parent) throws Exception {
+        ObservableList<JEVisClass> options = FXCollections.observableArrayList(parent.getAllowedChildrenClasses());
+        
+         Callback<ListView<JEVisClass>, ListCell<JEVisClass>> cellFactory = new Callback<ListView<JEVisClass>, ListCell<JEVisClass>>() {
+            @Override
+            public ListCell<JEVisClass> call(ListView<JEVisClass> param) {
+                final ListCell<JEVisClass> cell = new ListCell<JEVisClass>() {
+                    {
+                        super.setPrefWidth(260);
+                    }
+
+                    @Override
+                    public void updateItem(JEVisClass item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null && !empty) {
+                            HBox box = new HBox(5);
+                            box.setAlignment(Pos.CENTER_LEFT);
+                            try {
+                                ImageView icon = ImageConverter.convertToImageView(item.getIcon(), 15, 15);
+                                Label cName = new Label(item.getName());
+                                cName.setTextFill(Color.BLACK);
+                                box.getChildren().setAll(icon, cName);
+
+                            } catch (JEVisException ex) {
+                                Logger.getLogger(NewFormDialog.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+
+                            setGraphic(box);
+
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+        
         for (int i = 0; i < 10; i++) {
             listAttribute.add("");
         }
@@ -62,9 +103,14 @@ public class NewFormTable {
             for (int column = 0; column < grid.getColumnCount(); ++column) {
                 if (column == 1) {
                     SpreadsheetCell cellIndex = SpreadsheetCellType.STRING.createCell(row, column, 1, 1, null);
-                    cellIndex.setGraphic(new ComboBox());
+                    ComboBox<JEVisClass> comboBox = new ComboBox(options);
+                    comboBox.setMinWidth(250);
+                    comboBox.setCellFactory(cellFactory);
+                    comboBox.setButtonCell(cellFactory.call(null));
+                    
+                    cellIndex.setGraphic(comboBox);
                     cellIndex.setEditable(false);
-
+                    optionsList.add(comboBox);
                     cells.add(cellIndex);
 
                 } else {
@@ -92,7 +138,7 @@ public class NewFormTable {
         root.setCenter(spv);
 
         Scene scene = new Scene(root);
-        
+
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), new Runnable() {
 
             @Override
@@ -127,8 +173,8 @@ public class NewFormTable {
                 }
             }
         });
-        
-        stage.setTitle("JavaFX and Maven");
+
+        stage.setTitle("New Form");
         stage.setScene(scene);
         stage.show();
     }

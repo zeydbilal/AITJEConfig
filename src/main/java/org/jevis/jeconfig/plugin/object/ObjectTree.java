@@ -563,7 +563,6 @@ public class ObjectTree extends TreeView<JEVisObject> {
                             errorDia.show(JEConfig.getStage(), "Error", "Could not create user", "Could not create new user.", ex, JEConfig.PROGRAMM_INFO);
 
                         }
-
                     }
                 }
 
@@ -575,6 +574,8 @@ public class ObjectTree extends TreeView<JEVisObject> {
     //@AITBilal - Erstelle ein neues Fom-Object!
     public void fireEventNewFormTable(final JEVisObject parent) {
         NewFormTable table = new NewFormTable();
+        try {
+            table.initGUI(parent);
 //        NewFormDialog dia = new NewFormDialog();
 //
 //        if (parent != null) {
@@ -610,22 +611,12 @@ public class ObjectTree extends TreeView<JEVisObject> {
 //
 //                    }
 //                }
-
-//                        String name = dia.getCreateName();
-//                        JEVisObject newObject = parent.buildObject(name, dia.getCreateClass());
-//                    newObject.commit();
-//                    final TreeItem<JEVisObject> newTreeItem = buildItem(newObject);
-//                    TreeItem<JEVisObject> parentItem = getObjectTreeItem(parent);
 //
-//                    parentItem.getChildren().add(newTreeItem);
-//                    Platform.runLater(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            getSelectionModel().select(newTreeItem);
-//                        }
-//                    });
 //            }
 //        }
+        } catch (Exception ex) {
+            Logger.getLogger(ObjectTree.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     //TODO i dont like this way
