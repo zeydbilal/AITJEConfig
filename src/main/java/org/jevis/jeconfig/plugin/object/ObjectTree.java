@@ -574,8 +574,41 @@ public class ObjectTree extends TreeView<JEVisObject> {
     //@AITBilal - Erstelle ein neues Fom-Object!
     public void fireEventNewFormTable(final JEVisObject parent) {
         NewFormTable table = new NewFormTable();
-        try {
-            table.initGUI(parent);
+        if (parent != null) {
+            if (table.show(JEConfig.getStage(), null, parent, false, NewFormTable.Type.NEW, null) == NewFormTable.Response.YES) {
+
+                for (int i = 0; i < table.getlistObjectNames().size(); i++) {
+                    try {
+                        String name = table.getlistObjectNames().get(i);
+                        JEVisObject newObject = parent.buildObject(name, table.getListClasses().get(i));
+                        newObject.commit();
+                        final TreeItem<JEVisObject> newTreeItem = buildItem(newObject);
+                        TreeItem<JEVisObject> parentItem = getObjectTreeItem(parent);
+                        parentItem.getChildren().add(newTreeItem);
+
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                getSelectionModel().select(newTreeItem);
+                            }
+                        });
+                    } catch (JEVisException ex) {
+                        Logger.getLogger(ObjectTree.class.getName()).log(Level.SEVERE, null, ex);
+
+                        if (ex.getMessage().equals("Can not create User with this name. The User has to be unique on the System")) {
+                            InfoDialog info = new InfoDialog();
+                            info.show(JEConfig.getStage(), "Waring", "Could not create user", "Could not create new user because this user exists already.");
+
+                        } else {
+                            ExceptionDialog errorDia = new ExceptionDialog();
+                            errorDia.show(JEConfig.getStage(), "Error", "Could not create user", "Could not create new user.", ex, JEConfig.PROGRAMM_INFO);
+
+                        }
+
+                    }
+                }
+            }
+
 //        NewFormDialog dia = new NewFormDialog();
 //
 //        if (parent != null) {
@@ -614,8 +647,6 @@ public class ObjectTree extends TreeView<JEVisObject> {
 //
 //            }
 //        }
-        } catch (Exception ex) {
-            Logger.getLogger(ObjectTree.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

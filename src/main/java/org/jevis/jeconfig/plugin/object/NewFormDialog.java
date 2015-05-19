@@ -50,7 +50,6 @@ import org.jevis.jeconfig.tool.ImageConverter;
  */
 public class NewFormDialog {
 
-    private LinkedHashMap<String, JEVisClass> listHashMap = new LinkedHashMap<>();
     private LinkedList<String> listCreateName = new LinkedList<>();
     private LinkedList<JEVisClass> listCreateClass = new LinkedList<>();
 
@@ -60,9 +59,6 @@ public class NewFormDialog {
     private LinkedList<ComboBox<JEVisClass>> listComboBox = new LinkedList<>();
 
     public static String ICON = "add_a_form.png";
-
-    private JEVisClass createClass;
-    private String createName = "No Name";
 
     public static enum Type {
 
@@ -75,14 +71,6 @@ public class NewFormDialog {
     };
 
     private Response response = Response.CANCEL;
-
-    public String getCreateName() {
-        return createName;
-    }
-
-    public JEVisClass getCreateClass() {
-        return createClass;
-    }
 
     public LinkedList<String> getlistCreateName() {
         return listCreateName;
@@ -165,13 +153,6 @@ public class NewFormDialog {
         buttonPanel.setSpacing(10);
         buttonPanel.setMaxHeight(25);
 
-//        GridPane gp = new GridPane();
-//        gp.setPadding(new Insets(10));
-//        gp.setHgap(10);
-//        gp.setVgap(5);
-//        int x = 0;
-//
-//        Label lName = new Label("Name:");
         final TextField fName = new TextField();
         fName.setPromptText("Name of the Object");
 
@@ -265,11 +246,6 @@ public class NewFormDialog {
 
         hbox.getChildren().addAll(vBoxlistLabelName, vBoxlistTextFieldName, vBoxlistLabelClass, vBoxlistComboBox);
 
-//        gp.add(lName, 0, x);
-//        gp.add(fName, 1, x);
-//
-//        gp.add(lClass, 0, ++x, 1, 1);
-//        gp.add(comboBox, 1, x, 1, 1);
         Separator sep = new Separator(Orientation.HORIZONTAL);
         sep.setMinHeight(10);
 
@@ -283,13 +259,11 @@ public class NewFormDialog {
             public void handle(ActionEvent t) {
                 stage.close();
 
-//                createName = fName.getText();
-//                createClass = comboBox.getSelectionModel().getSelectedItem();
                 for (int i = 0; i < listTextFieldName.size(); i++) {
                     listCreateName.add(listTextFieldName.get(i).getText());
                     listCreateClass.add(listComboBox.get(i).getSelectionModel().getSelectedItem());
                 }
-                
+
                 response = Response.YES;
             }
         });
