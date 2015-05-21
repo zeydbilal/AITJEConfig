@@ -21,7 +21,6 @@ package org.jevis.jeconfig.tool;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -34,11 +33,9 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -112,14 +109,14 @@ public class WelcomePage {
 //        Platform.runLater(new Runnable() {
 //            @Override
 //            public void run() {
-//                
+//
 //            }
 //        });
 //        new Thread() {
 //
 //            @Override
 //            public void run() {
-//                
+//
 //            }
 //        }.start();
         root.getChildren().add(new Separator(Orientation.HORIZONTAL));

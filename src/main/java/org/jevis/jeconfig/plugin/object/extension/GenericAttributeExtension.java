@@ -49,6 +49,7 @@ import org.jevis.jeconfig.plugin.object.ObjectEditorExtension;
 import static org.jevis.jeconfig.JEConfig.PROGRAMM_INFO;
 import org.jevis.jeconfig.plugin.object.attribute.AttributeEditor;
 import org.jevis.jeconfig.plugin.object.attribute.BooleanValueEditor;
+import org.jevis.jeconfig.plugin.object.attribute.FileEdior;
 import org.jevis.jeconfig.plugin.object.attribute.FileValueEditor;
 import org.jevis.jeconfig.plugin.object.attribute.NumberWithUnit;
 import org.jevis.jeconfig.plugin.object.attribute.PasswordEditor;
@@ -172,8 +173,8 @@ public class GenericAttributeExtension implements ObjectEditorExtension {
                         editor = new BooleanValueEditor(att);
                         break;
                     case JEVisConstants.PrimitiveType.FILE:
-                        if (att.getType().getGUIDisplayType().equals(GUIConstants.NUMBER_WITH_UNIT.getId())) {
-                            editor = new FileValueEditor(att);
+                        if (att.getType().getGUIDisplayType().equals(GUIConstants.BASIC_FILER.getId())) {
+                            editor = new FileEdior(att);
                         } else {
                             editor = new StringValueEditor(att);
                         }

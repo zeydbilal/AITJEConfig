@@ -206,7 +206,7 @@ public class LoginGlass extends AnchorPane {
                     SimpleServerConfig serverConfig = serverSelection.getSelectionModel().getSelectedItem();
                     System.out.println("ServerConfig: " + serverConfig);
                     updateTitle("Login");
-                    updateMessage("Connecting to " + serverConfig);
+                    updateMessage("Connecting to " + serverConfig + "  usinf db-user: " + serverConfig.getUsername());
                     updateProgress(-2, -1);
                     _ds = new JEVisDataSourceSQL(
                             serverConfig.getServer(),
@@ -709,6 +709,8 @@ public class LoginGlass extends AnchorPane {
             serverConfigurations.add(openJEvisOrg);
             SimpleServerConfig Coffee = new SimpleServerConfig(2, "COFFEE Project", "coffee-project.eu", "13306", "jevis", "jevis", "jevistest");
             serverConfigurations.add(Coffee);
+            SimpleServerConfig localhost = new SimpleServerConfig(2, "Localhost", "127.0.0.1", "3306", "jevis", "jevis", "jevistest");
+            serverConfigurations.add(localhost);
         }
 
         Callback<ListView<SimpleServerConfig>, ListCell<SimpleServerConfig>> cellFactory = new SimpleServerConfig().buildCellRenderer();
@@ -794,6 +796,7 @@ public class LoginGlass extends AnchorPane {
                 newValue.setUsername(userF.getText());
                 newValue.setPassword(passF.getText());
                 newValue.save();
+
             }
         });
         cancel.setOnAction(new EventHandler<ActionEvent>() {

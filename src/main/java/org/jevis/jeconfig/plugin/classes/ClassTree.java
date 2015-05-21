@@ -111,6 +111,7 @@ public class ClassTree extends TreeView<JEVisClass> {
                             if (!empty) {
                                 ClassGraphic gc = getClassGraphic(item);
 
+                                setContextMenu(gc.getContexMenu());
 //                                setText(item);
                                 setGraphic(gc.getGraphic());
                             } else {

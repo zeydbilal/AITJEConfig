@@ -87,7 +87,7 @@ public class CSVImportDialog {
     final Button ok = new Button("Import");
     final Button automatic = new Button("Detect");//, JEConfig.getImage("1403018303_Refresh.png", 15, 15));
     final Button fileButton = new Button("Choose..");
-    final Button saveFormate = new Button("Save Formate");
+    final Button saveFormat = new Button("Save Format");
     Button reload = new Button("Preview");//, JEConfig.getImage("1403018303_Refresh.png", 20, 20));
     final NumberSpinner count = new NumberSpinner(BigDecimal.valueOf(1), BigDecimal.valueOf(1));
 
@@ -105,7 +105,7 @@ public class CSVImportDialog {
     RadioButton otherTextSep = new RadioButton("Other:");
 
     final ToggleGroup textDiGroup = new ToggleGroup();
-    ObservableList<String> formateOptions;
+    ObservableList<String> formatOptions;
 
     final VBox tableRootPane = new VBox(10);
 
@@ -116,7 +116,7 @@ public class CSVImportDialog {
     private JEVisDataSource _ds;
     private CSVTable tree;
 
-    public static enum Formate {
+    public static enum Format {
 
         Default, ARA01, Custom
     };
@@ -178,7 +178,7 @@ public class CSVImportDialog {
         Button cancel = new Button("Cancel");
         cancel.setCancelButton(true);
 
-        buttonPanel.getChildren().setAll(saveFormate, ok, cancel);
+        buttonPanel.getChildren().setAll(saveFormat, ok, cancel);
         buttonPanel.setAlignment(Pos.BOTTOM_RIGHT);
         buttonPanel.setPadding(new Insets(5));
 
@@ -224,12 +224,10 @@ public class CSVImportDialog {
             public void handle(ActionEvent t) {
                 stage.close();
                 response = Response.CANCEL;
-
             }
         });
 
         ok.setOnAction(new EventHandler<ActionEvent>() {
-
             @Override
             public void handle(ActionEvent t) {
                 System.out.println("size: h:" + stage.getHeight() + " w:" + stage.getWidth());
@@ -238,7 +236,6 @@ public class CSVImportDialog {
                     dia.show(stage, "Success", "Import was successful", "Import was successful.");
                 }
 //                stage.hide();
-
             }
         });
 
@@ -259,7 +256,6 @@ public class CSVImportDialog {
                 if (tree != null) {
                     tree.setPrefHeight(t1.doubleValue());
                 }
-
             }
         });
         VBox.setVgrow(tree, Priority.ALWAYS);
@@ -358,7 +354,6 @@ public class CSVImportDialog {
             @Override
             public void changed(ObservableValue<? extends Toggle> ov, Toggle t, Toggle t1) {
                 updateEnclosed();
-
             }
         });
 
@@ -591,7 +586,7 @@ public class CSVImportDialog {
 
 //        gp.setStyle("-fx-background-color: #EBED50;");
         Label fileL = new Label("File:");
-        Label formateL = new Label("Formate:");
+        Label formatL = new Label("Format:");
         Label charSetL = new Label("Character set:");
         Label fromRow = new Label("From row:");
         final Label fileNameL = new Label();
@@ -601,22 +596,22 @@ public class CSVImportDialog {
         final ComboBox<String> chaset = new ComboBox<String>(options);
         chaset.getSelectionModel().selectFirst();
 
-        formateOptions = FXCollections.observableArrayList();
-        for (Formate formate : Formate.values()) {
-            formateOptions.add(formate.name());
+        formatOptions = FXCollections.observableArrayList();
+        for (Format format : Format.values()) {
+            formatOptions.add(format.name());
         }
 
-//        formateOptions = FXCollections.observableArrayList("MS Office, ARA01, Custom");
-        final ComboBox<String> fomates = new ComboBox<String>(formateOptions);
-        fomates.getSelectionModel().selectFirst();
+//        formatOptions = FXCollections.observableArrayList("MS Office, ARA01, Custom");
+        final ComboBox<String> formats = new ComboBox<String>(formatOptions);
+        formats.getSelectionModel().selectFirst();
 
         Node title = buildTitle("File Options");
 
         fileButton.setPrefWidth(100);
         chaset.setPrefWidth(100);
-        fomates.setPrefWidth(100);
+        formats.setPrefWidth(100);
         chaset.setMaxWidth(1000);
-        fomates.setMaxWidth(1000);
+        formats.setMaxWidth(1000);
 
         count.setMinHeight(22);
         count.numberProperty().addListener(new ChangeListener<BigDecimal>() {
@@ -642,7 +637,7 @@ public class CSVImportDialog {
 
                         setEncloser(analys.getEnclosed());
                         setSeperator(analys.getSeperator());
-                        fomates.getSelectionModel().select(Formate.Custom.name());
+                        formats.getSelectionModel().select(Format.Custom.name());
                         updateTree();
 
                     } catch (Exception ex) {
@@ -665,7 +660,6 @@ public class CSVImportDialog {
                     if (file.exists() && file.canRead()) {
                         fileChooser.setInitialDirectory(file);
                     }
-
                 }
 
                 FileChooser.ExtensionFilter csvFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
@@ -698,8 +692,8 @@ public class CSVImportDialog {
         gp.add(fileButton, 1, x);
         gp.add(fileNameL, 2, x);
 
-        gp.add(formateL, 0, ++x);
-        gp.add(fomates, 1, x);
+        gp.add(formatL, 0, ++x);
+        gp.add(formats, 1, x);
         gp.add(automatic, 2, x);
 
         gp.add(charSetL, 0, ++x);

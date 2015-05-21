@@ -23,8 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -32,9 +30,6 @@ import javafx.scene.control.CheckBox;
 import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisSample;
-import org.jevis.application.dialog.ExceptionDialog;
-import org.jevis.jeconfig.JEConfig;
-import static org.jevis.jeconfig.JEConfig.PROGRAMM_INFO;
 import org.joda.time.DateTime;
 
 /**

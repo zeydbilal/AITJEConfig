@@ -320,7 +320,7 @@ public class SampleEditor {
             }
         });
 
-        //TODO: replace Workaround.., without it the first tab will be emty 
+        //TODO: replace Workaround.., without it the first tab will be emty
 //        tabPane.getSelectionModel().selectLast();
 //        tabPane.getSelectionModel().selectFirst();
         Platform.runLater(new Runnable() {
@@ -386,7 +386,7 @@ public class SampleEditor {
 
             }
         });
-//        
+//
         List<String> aggList = new ArrayList<>();
         aggList.add("None");
         aggList.add("Daily");

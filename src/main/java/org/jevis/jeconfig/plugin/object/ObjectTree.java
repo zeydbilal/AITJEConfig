@@ -101,7 +101,7 @@ public class ObjectTree extends TreeView<JEVisObject> {
                 @Override
                 public void changed(ObservableValue<? extends TreeItem<JEVisObject>> ov, TreeItem<JEVisObject> t, TreeItem<JEVisObject> t1) {
                     try {
-                        if (t1.getValue().getJEVisClass() != null) {
+                        if (t1.getValue() != null && t1.getValue().getJEVisClass() != null) {
                             loadingObjectProperty.setValue(true);
                             if (t1.getValue().getJEVisClass().getName().equals(CommonClasses.LINK.NAME)) {
                                 System.out.println("changed: oh object is a link so im loading the linked object");
@@ -139,6 +139,9 @@ public class ObjectTree extends TreeView<JEVisObject> {
 
                             if (!empty) {
                                 ObjectGraphic gc = getObjectGraphic(item);
+
+                                setTooltip(gc.getToolTip());
+                                setContextMenu(gc.getContexMenu());
 
 //                                setText(item);
                                 setGraphic(gc.getGraphic());

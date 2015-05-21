@@ -4,7 +4,7 @@
 
     <groupId>org.jevis.jeconfig</groupId>
     <artifactId>JEConfig</artifactId>
-    <version>3.0.8</version>
+    <version>3.0.10</version>
     <packaging>jar</packaging>
 
     <name>JEConfig</name>
@@ -54,7 +54,8 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${java.home}/../bin/javafxpackager</executable>
+                            <!--<executable>${java.home}/../bin/javafxpackager</executable>-->
+                            <executable>${java.home}/../bin/javapackager</executable>
                             <arguments>
                                 <argument>-createjar</argument>
                                 <argument>-nocss2bin</argument>
@@ -91,6 +92,7 @@
                     <compilerArguments>
                         <bootclasspath>${sun.boot.class.path}${path.separator}${java.home}/lib/jfxrt.jar</bootclasspath>
                     </compilerArguments>
+                    <debug>false</debug>
                 </configuration>
             </plugin>
             <plugin>

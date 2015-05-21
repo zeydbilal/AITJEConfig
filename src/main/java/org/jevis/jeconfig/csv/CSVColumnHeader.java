@@ -72,6 +72,7 @@ import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisException;
+import org.jevis.api.JEVisUnit;
 import org.jevis.application.dialog.SelectTargetDialog;
 import org.jevis.application.object.tree.UserSelection;
 import org.jevis.application.resource.ResourceLoader;
@@ -194,9 +195,11 @@ public class CSVColumnHeader {
                     DecimalFormat df = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00###################################");
 //                    String unit = "";
 //
-//                    if (getTarget() != null && getTarget().getUnit() != null) {
-//                        unit = " " + UnitFormat.getInstance().format(getTarget().getUnit());
-//                    }
+                    if (getTarget() != null && getTarget().getInputUnit() != null) {
+                        JEVisUnit unit = getTarget().getInputUnit();
+                        System.out.println("Value with unit: " + df.format(getValueAsDouble(value)) + unit.getLabel());
+                        return df.format(getValueAsDouble(value)) + unit.getLabel();
+                    }
 //                    System.out.println("unit.formate: " + unit);
 
 //                    return df.format(getValueAsDouble(value)) + unit;
@@ -272,7 +275,7 @@ public class CSVColumnHeader {
             datetime.getTime();
             return new DateTime(datetime);
 
-//            DateTimeZone.setDefault(DateTimeZone.forTimeZone(getTimeZone()));            
+//            DateTimeZone.setDefault(DateTimeZone.forTimeZone(getTimeZone()));
 //            return DateTimeFormat.forPattern(getCurrentFormate()).parseDateTime(value);
         } else {
             throw new ParseException(value, coloumNr);
@@ -714,7 +717,7 @@ public class CSVColumnHeader {
 //                            Unit kwh = SI.KILO(SI.WATT.times(NonSI.HOUR));
 //                            _target.setUnit(kwh);
 //                            _target.getObject().commit();
-//                            
+//
 //                        } catch (JEVisException ex) {
 //                            Logger.getLogger(CSVColumnHeader.class.getName()).log(Level.SEVERE, null, ex);
 //                        }
