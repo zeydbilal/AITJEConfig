@@ -23,7 +23,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -233,8 +232,8 @@ public class NewFormTable {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(owner);
         stage.setScene(scene);
-        stage.setWidth(700);
-        stage.setHeight(700);
+        stage.setWidth(1000);
+        stage.setHeight(1000);
         stage.initStyle(StageStyle.UTILITY);
         stage.setResizable(true);
         stage.showAndWait();
