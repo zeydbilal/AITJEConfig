@@ -75,8 +75,8 @@ public class NewFormTable {
 
         ObservableList<JEVisClass> options = FXCollections.observableArrayList();
         try {
-            if(type == Type.NEW){
-            options = FXCollections.observableArrayList(parent.getAllowedChildrenClasses());
+            if (type == Type.NEW) {
+                options = FXCollections.observableArrayList(parent.getAllowedChildrenClasses());
             }
         } catch (JEVisException ex) {
             Logger.getLogger(NewFormTable.class.getName()).log(Level.SEVERE, null, ex);

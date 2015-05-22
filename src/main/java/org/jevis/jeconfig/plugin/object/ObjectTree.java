@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -56,12 +57,16 @@ import org.jevis.api.JEVisDataSource;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.api.JEVisRelationship;
+import org.jevis.api.JEVisSample;
+import org.jevis.api.JEVisUnit;
 import org.jevis.application.dialog.ConfirmDialog;
 import org.jevis.application.dialog.ExceptionDialog;
 import org.jevis.application.dialog.InfoDialog;
 import org.jevis.commons.CommonClasses;
 import org.jevis.commons.CommonObjectTasks;
+import org.jevis.commons.unit.JEVisUnitImp;
 import org.jevis.jeconfig.JEConfig;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -586,13 +591,23 @@ public class ObjectTree extends TreeView<JEVisObject> {
                         String name = table.getlistObjectNames().get(i);
                         JEVisObject newObject = parent.buildObject(name, table.getListClasses().get(i));
                         newObject.commit();
-                        //TODO
-                        //FIXME
-                        newObject.getAttribute("").addSamples(null);
-                        for (JEVisAttribute attribute : newObject.getAttributes()) {
-//                            attribute.addSamples(null)
-                        }
 
+                        //TODO 1.Attribute einsetzen! 
+                        //FIXME
+//                        newObject.getAttribute("").addSamples(null);
+                        for (JEVisAttribute attribut : newObject.getAttributes()) {
+                            attribut.setDisplayUnit(new JEVisUnitImp(name, name, JEVisUnit.Prefix.KILO));
+
+                        }
+                        //TODO 2.Sample einsetzen! 
+//                          Example-codes from NumberWihtUnit.java
+
+//                           private final BooleanProperty _changed = new SimpleBooleanProperty(false); 
+//                           JEVisSample _newSample;
+//                           _newSample = _attribute.buildSample(new DateTime(), _field.getText());
+//                           _changed.setValue(true);
+//                           i can need to commit() ???
+                        
                         final TreeItem<JEVisObject> newTreeItem = buildItem(newObject);
                         TreeItem<JEVisObject> parentItem = getObjectTreeItem(parent);
                         parentItem.getChildren().add(newTreeItem);
