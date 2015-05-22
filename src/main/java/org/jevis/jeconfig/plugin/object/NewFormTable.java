@@ -175,6 +175,7 @@ public class NewFormTable {
             @Override
             public void run() {
                 try {
+                    //FIXME
                     Clipboard clipboard = Clipboard.getSystemClipboard();
 
                     if (clipboard.hasString()) {

@@ -50,6 +50,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
+import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisConstants;
 import org.jevis.api.JEVisDataSource;
 import org.jevis.api.JEVisException;
@@ -585,6 +586,13 @@ public class ObjectTree extends TreeView<JEVisObject> {
                         String name = table.getlistObjectNames().get(i);
                         JEVisObject newObject = parent.buildObject(name, table.getListClasses().get(i));
                         newObject.commit();
+                        //TODO
+                        //FIXME
+                        newObject.getAttribute("").addSamples(null);
+                        for (JEVisAttribute attribute : newObject.getAttributes()) {
+//                            attribute.addSamples(null)
+                        }
+
                         final TreeItem<JEVisObject> newTreeItem = buildItem(newObject);
                         TreeItem<JEVisObject> parentItem = getObjectTreeItem(parent);
                         parentItem.getChildren().add(newTreeItem);
