@@ -193,10 +193,16 @@ public class NewFormTable {
                         }
 
                         for (String word : words) {
-                            SpreadsheetCell spc = rows.get(currentRow).get(currentColumn);
-                            grid.setCellValue(currentRow, currentColumn, spc.getCellType().convertValue(word));
+                            String[] parseWord = word.split("\t");
+                            int col = currentColumn;
+                            for (int i = 0; i < parseWord.length; i++) {
+                                SpreadsheetCell spc = rows.get(currentRow).get(col);
+                                grid.setCellValue(currentRow, col, spc.getCellType().convertValue(parseWord[i]));
+                                col++;
+                            }
                             currentRow++;
                         }
+                        
                     } else {
                         spv.pasteClipboard();
                     }
