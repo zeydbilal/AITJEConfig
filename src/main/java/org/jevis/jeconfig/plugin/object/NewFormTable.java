@@ -58,8 +58,8 @@ public class NewFormTable {
     private int rowCount;
     private int columnCount;
     private CreateNewTable createNewTable;
-    
-    
+    private ObservableList<String> columnHeaderNames = FXCollections.observableArrayList();
+
     class CreateNewTable {
 
         public CreateNewTable() {
@@ -92,6 +92,18 @@ public class NewFormTable {
 
             spv.setEditable(true);
             spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            
+            columnHeaderNames.add("Object Name");
+            try {
+                //Get and set Typenames :)
+                for (int i = 0; i < createClass.getTypes().size(); i++) {
+                    columnHeaderNames.add(createClass.getTypes().get(i).getName());
+                }
+
+            } catch (JEVisException ex) {
+                Logger.getLogger(NewFormTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            spv.getGrid().getColumnHeaders().addAll(columnHeaderNames);
         }
     }
 
@@ -164,6 +176,7 @@ public class NewFormTable {
         classComboBox.setMinWidth(250);
         classComboBox.getSelectionModel().selectFirst();
         createClass = classComboBox.getSelectionModel().getSelectedItem();
+
         createNewTable = new CreateNewTable();
         /*
          try {
@@ -295,9 +308,12 @@ public class NewFormTable {
             @Override
             public void handle(ActionEvent event) {
                 rows.clear();
+                columnHeaderNames.clear();
                 createClass = classComboBox.getSelectionModel().getSelectedItem();
+
                 createNewTable = new CreateNewTable();
                 root.setCenter(spv);
+
             }
         });
 
