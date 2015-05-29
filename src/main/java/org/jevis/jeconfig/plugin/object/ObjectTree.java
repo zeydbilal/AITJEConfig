@@ -589,25 +589,24 @@ public class ObjectTree extends TreeView<JEVisObject> {
                 for (int i = 0; i < table.getlistObjectNames().size(); i++) {
                     try {
                         String name = table.getlistObjectNames().get(i);
-                        JEVisObject newObject = parent.buildObject(name, table.getListClasses().get(i));
+//                        JEVisObject newObject = parent.buildObject(name, table.getListClasses().get(i));
+                        JEVisObject newObject = parent.buildObject(name, table.getCreateClass());
                         newObject.commit();
 
                         //TODO 1.Attribute einsetzen! 
                         //FIXME
 //                        newObject.getAttribute("").addSamples(null);
-                        for (JEVisAttribute attribut : newObject.getAttributes()) {
-                            attribut.setDisplayUnit(new JEVisUnitImp(name, name, JEVisUnit.Prefix.KILO));
-
-                        }
+//                        for (JEVisAttribute attribut : newObject.getAttributes()) {
+//                            attribut.setDisplayUnit(new JEVisUnitImp(name, name, JEVisUnit.Prefix.KILO));
+//
+//                        }
                         //TODO 2.Sample einsetzen! 
 //                          Example-codes from NumberWihtUnit.java
-
 //                           private final BooleanProperty _changed = new SimpleBooleanProperty(false); 
 //                           JEVisSample _newSample;
 //                           _newSample = _attribute.buildSample(new DateTime(), _field.getText());
 //                           _changed.setValue(true);
 //                           i can need to commit() ???
-                        
                         final TreeItem<JEVisObject> newTreeItem = buildItem(newObject);
                         TreeItem<JEVisObject> parentItem = getObjectTreeItem(parent);
                         parentItem.getChildren().add(newTreeItem);

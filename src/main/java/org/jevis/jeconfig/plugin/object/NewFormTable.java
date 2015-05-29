@@ -51,10 +51,49 @@ public class NewFormTable {
     private SpreadsheetView spv;
     private GridBase grid;
     private Stage stage = new Stage();
-
+    private JEVisClass createClass;
     private LinkedList<String> listObjectNames = new LinkedList<>();
-    private LinkedList<JEVisClass> listCreateClass = new LinkedList<>();
-    private LinkedList<ComboBox<JEVisClass>> listComboBox = new LinkedList<>();
+//    private LinkedList<JEVisClass> listCreateClass = new LinkedList<>();
+//    private LinkedList<ComboBox<JEVisClass>> listComboBox = new LinkedList<>();
+    private int rowCount;
+    private int columnCount;
+    private CreateNewTable createNewTable;
+    
+    
+    class CreateNewTable {
+
+        public CreateNewTable() {
+            try {
+                rowCount = 1000;
+                columnCount = createClass.getTypes().size();
+            } catch (JEVisException ex) {
+                Logger.getLogger(NewFormTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            grid = new GridBase(rowCount, columnCount);
+
+            for (int row = 0; row < grid.getRowCount(); ++row) {
+                cells = FXCollections.observableArrayList();
+                for (int column = 0; column < grid.getColumnCount(); ++column) {
+                    cells.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
+                }
+
+                rows.add(cells);
+            }
+            grid.setRows(rows);
+            spv = new SpreadsheetView();
+            spv.setGrid(grid);
+
+            ObservableList<SpreadsheetColumn> colList = spv.getColumns();
+
+            for (SpreadsheetColumn colListElement : colList) {
+                colListElement.setPrefWidth(150);
+            }
+
+            spv.setEditable(true);
+            spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        }
+    }
 
     public static enum Type {
 
@@ -72,7 +111,6 @@ public class NewFormTable {
     }
 
     public Response show(Stage owner, final JEVisClass jclass, final JEVisObject parent, boolean fixClass, Type type, String objName) {
-
         ObservableList<JEVisClass> options = FXCollections.observableArrayList();
         try {
             if (type == Type.NEW) {
@@ -114,60 +152,76 @@ public class NewFormTable {
                 return cell;
             }
         };
+        //        for (int i = 0; i < 10; i++) {
+        //            listAttribute.add("");
+        //        }
+        //        rowCount = 1000;
+        //        columnCount = listAttribute.size();
+        //FIXME
+        ComboBox<JEVisClass> classComboBox = new ComboBox<JEVisClass>(options);
+        classComboBox.setCellFactory(cellFactory);
+        classComboBox.setButtonCell(cellFactory.call(null));
+        classComboBox.setMinWidth(250);
+        classComboBox.getSelectionModel().selectFirst();
+        createClass = classComboBox.getSelectionModel().getSelectedItem();
+        createNewTable = new CreateNewTable();
+        /*
+         try {
+         rowCount = 1000;
+         columnCount = createClass.getTypes().size();
+         } catch (JEVisException ex) {
+         Logger.getLogger(NewFormTable.class.getName()).log(Level.SEVERE, null, ex);
+         }
 
-        for (int i = 0; i < 10; i++) {
-            listAttribute.add("");
-        }
+         grid = new GridBase(rowCount, columnCount);
 
-        int rowCount = 1000;
-        int columnCount = listAttribute.size();
-        grid = new GridBase(rowCount, columnCount);
+         for (int row = 0; row < grid.getRowCount(); ++row) {
+         cells = FXCollections.observableArrayList();
+         for (int column = 0; column < grid.getColumnCount(); ++column) {
+         //                if (column == 1) {
+         //                    SpreadsheetCell cellIndex = SpreadsheetCellType.STRING.createCell(row, column, 1, 1, null);
+         //                    ComboBox<JEVisClass> comboBox = new ComboBox(options);
+         //                    comboBox.setMinWidth(250);
+         //                    comboBox.setCellFactory(cellFactory);
+         //                    comboBox.setButtonCell(cellFactory.call(null));
+         //                    comboBox.getSelectionModel().selectFirst();
+         //                    cellIndex.setGraphic(comboBox);
+         //                    cellIndex.setEditable(false);
+         //                    listComboBox.add(comboBox);
+         //                    cells.add(cellIndex);
+         //
+         //                } else {
+         cells.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
+         //                }
+         }
 
-        for (int row = 0; row < grid.getRowCount(); ++row) {
-            cells = FXCollections.observableArrayList();
-            for (int column = 0; column < grid.getColumnCount(); ++column) {
-                if (column == 1) {
-                    SpreadsheetCell cellIndex = SpreadsheetCellType.STRING.createCell(row, column, 1, 1, null);
-                    ComboBox<JEVisClass> comboBox = new ComboBox(options);
-                    comboBox.setMinWidth(250);
-                    comboBox.setCellFactory(cellFactory);
-                    comboBox.setButtonCell(cellFactory.call(null));
-                    comboBox.getSelectionModel().selectFirst();
-                    cellIndex.setGraphic(comboBox);
-                    cellIndex.setEditable(false);
-                    listComboBox.add(comboBox);
-                    cells.add(cellIndex);
+         rows.add(cells);
+         }
+         grid.setRows(rows);
+         spv = new SpreadsheetView();
+         spv.setGrid(grid);
 
-                } else {
-                    cells.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
-                }
-            }
+         ObservableList<SpreadsheetColumn> colList = spv.getColumns();
 
-            rows.add(cells);
-        }
-        grid.setRows(rows);
+         for (SpreadsheetColumn colListElement : colList) {
+         colListElement.setPrefWidth(150);
+         }
 
-        spv = new SpreadsheetView();
-        spv.setGrid(grid);
-
-        ObservableList<SpreadsheetColumn> colList = spv.getColumns();
-
-        for (SpreadsheetColumn colListElement : colList) {
-            colListElement.setPrefWidth(150);
-        }
-
-        spv.setEditable(true);
-        spv.getSelectionModel().setCellSelectionEnabled(true);
-        spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+         spv.setEditable(true);
+         //Removed from Library
+         //spv.getSelectionModel().setCellSelectionEnabled(true);
+         spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+         */
         BorderPane root = new BorderPane();
+
         Button create = new Button("Create Structure");
 
         Button cancel = new Button("Cancel");
         HBox hbox = new HBox();
-        hbox.getChildren().addAll(create, cancel);
+        hbox.getChildren().addAll(classComboBox, create, cancel);
         root.setTop(hbox);
+        //remove it
         root.setCenter(spv);
-
         Scene scene = new Scene(root);
 
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), new Runnable() {
@@ -202,7 +256,7 @@ public class NewFormTable {
                             }
                             currentRow++;
                         }
-                        
+
                     } else {
                         spv.pasteClipboard();
                     }
@@ -220,7 +274,7 @@ public class NewFormTable {
                     SpreadsheetCell spc = rows.get(i).get(0);
                     if (!spc.getText().equals("")) {
                         listObjectNames.add(spc.getText());
-                        listCreateClass.add(listComboBox.get(i).getSelectionModel().getSelectedItem());
+//                        listCreateClass.add(listComboBox.get(i).getSelectionModel().getSelectedItem());
                     }
                 }
                 response = Response.YES;
@@ -235,6 +289,18 @@ public class NewFormTable {
 
             }
         });
+
+        classComboBox.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                rows.clear();
+                createClass = classComboBox.getSelectionModel().getSelectedItem();
+                createNewTable = new CreateNewTable();
+                root.setCenter(spv);
+            }
+        });
+
         stage.setTitle("New Form");
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(owner);
@@ -252,7 +318,11 @@ public class NewFormTable {
         return listObjectNames;
     }
 
-    public LinkedList<JEVisClass> getListClasses() {
-        return listCreateClass;
+//    public LinkedList<JEVisClass> getListClasses() {
+//        return listCreateClass;
+//    }
+    public JEVisClass getCreateClass() {
+        return createClass;
     }
+
 }
