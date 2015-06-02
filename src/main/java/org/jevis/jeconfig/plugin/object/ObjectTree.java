@@ -19,6 +19,7 @@
  */
 package org.jevis.jeconfig.plugin.object;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -586,27 +587,26 @@ public class ObjectTree extends TreeView<JEVisObject> {
         if (parent != null) {
             if (table.show(JEConfig.getStage(), null, parent, false, NewFormTable.Type.NEW, null) == NewFormTable.Response.YES) {
 
-                for (int i = 0; i < table.getlistObjectNames().size(); i++) {
+                for (int i = 0; i < table.getPairList().size(); i++) {
                     try {
-                        String name = table.getlistObjectNames().get(i);
-//                        JEVisObject newObject = parent.buildObject(name, table.getListClasses().get(i));
-                        JEVisObject newObject = parent.buildObject(name, table.getCreateClass());
-                        newObject.commit();
+//                      String objectName = table.getlistObjectNames().get(i);
 
-                        //TODO 1.Attribute einsetzen! 
+                        String objectName = table.getPairList().get(i).getKey();
+                        JEVisObject newObject = parent.buildObject(objectName, table.getCreateClass());
+                        newObject.commit();
+                        
+                        List<JEVisAttribute> attribut = newObject.getAttributes();
+                        for (int j = 0; j < attribut.size(); j++) {
+                            attribut.get(j).buildSample(new DateTime(), table.getPairList().get(i).getValue().get(j)).commit();
+                        }
+
+                        // For Data object!!!
                         //FIXME
 //                        newObject.getAttribute("").addSamples(null);
 //                        for (JEVisAttribute attribut : newObject.getAttributes()) {
 //                            attribut.setDisplayUnit(new JEVisUnitImp(name, name, JEVisUnit.Prefix.KILO));
 //
 //                        }
-                        //TODO 2.Sample einsetzen! 
-//                          Example-codes from NumberWihtUnit.java
-//                           private final BooleanProperty _changed = new SimpleBooleanProperty(false); 
-//                           JEVisSample _newSample;
-//                           _newSample = _attribute.buildSample(new DateTime(), _field.getText());
-//                           _changed.setValue(true);
-//                           i can need to commit() ???
                         final TreeItem<JEVisObject> newTreeItem = buildItem(newObject);
                         TreeItem<JEVisObject> parentItem = getObjectTreeItem(parent);
                         parentItem.getChildren().add(newTreeItem);
