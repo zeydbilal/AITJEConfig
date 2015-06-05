@@ -55,6 +55,7 @@ import javafx.util.Callback;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
+import javax.measure.unit.UnitFormat;
 import net.miginfocom.layout.UnitValue;
 import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisConstants;
@@ -72,6 +73,7 @@ import org.jevis.application.unit.UnitObject;
 import org.jevis.commons.CommonClasses;
 import org.jevis.commons.CommonObjectTasks;
 import org.jevis.commons.unit.JEVisUnitImp;
+import org.jevis.commons.unit.UnitFormula;
 import org.jevis.jeconfig.JEConfig;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -602,17 +604,23 @@ public class ObjectTree extends TreeView<JEVisObject> {
                             newObject.commit();
                             //TODO
                             //FIXME
-                            
-                            JEVisUnit.Prefix prefixDisplayUnit = JEVisUnit.Prefix.valueOf("KILO");
-                            JEVisUnit.Prefix prefixInputUnit = JEVisUnit.Prefix.valueOf("KILO");
-                            
+
+                            JEVisUnit.Prefix prefixDisplayUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(2));
+                            JEVisUnit.Prefix prefixInputUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(5));
+
+                            String displaySymbol = table.getPairList().get(i).getValue().get(1);
+                            String inputSymbol = table.getPairList().get(i).getValue().get(4);
+
                             JEVisAttribute attributeValue = newObject.getAttribute("Value");
-                            attributeValue.setDisplayUnit(new JEVisUnitImp(SI.WATT, "Wh", prefixDisplayUnit));
-                            attributeValue.setInputUnit(new JEVisUnitImp(SI.WATT, "Wh", prefixInputUnit));
-                            
-                            attributeValue.setDisplaySampleRate(new SampleRateNode(Period.parse("PT90H37M38S")).getPeriod());
-                            attributeValue.setInputSampleRate(new SampleRateNode(Period.parse("PT138H15M")).getPeriod());
-                            
+                            attributeValue.setDisplayUnit(new JEVisUnitImp(Unit.valueOf(displaySymbol), "", prefixDisplayUnit));
+                            attributeValue.setInputUnit(new JEVisUnitImp(Unit.valueOf(inputSymbol), "", prefixInputUnit));
+
+                            String displaySampleRate = table.getPairList().get(i).getValue().get(3);
+                            String inputSampleRate = table.getPairList().get(i).getValue().get(6);
+
+                            attributeValue.setDisplaySampleRate(Period.parse(displaySampleRate));
+                            attributeValue.setInputSampleRate(Period.parse(inputSampleRate));
+
                             attributeValue.commit();
 
                         } else {
