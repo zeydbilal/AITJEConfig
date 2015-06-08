@@ -246,7 +246,7 @@ public class NewFormTable {
                 for (int i = 0; i < grid.getRowCount(); i++) {
                     SpreadsheetCell spcObjectName = rows.get(i).get(0);
                     if (!spcObjectName.getText().equals("")) {
-                        
+
                         ArrayList<String> attributs = new ArrayList<>();
                         for (int j = 1; j < grid.getColumnCount(); j++) {
                             SpreadsheetCell spcAttribut = rows.get(i).get(j);
@@ -325,9 +325,9 @@ public class NewFormTable {
     class CreateNewDataTable {
 
         public CreateNewDataTable() {
-
+            String[] colNames = {"Object Name", "Display Symbol", "Display Prefix", "Display Sample Rate", "Input Symbol", "Input Prefix", "Input Sample Rate"};
             rowCount = 1000;
-            columnCount = 7;
+            columnCount = colNames.length;
 
             grid = new GridBase(rowCount, columnCount);
 
@@ -352,7 +352,6 @@ public class NewFormTable {
             spv.setEditable(true);
             spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-            String[] colNames = {"Object Name", "Display Symbol", "Display Prefix", "Display Sample Rate", "Input Symbol", "Input Prefix", "Input Sample Rate"};
             columnHeaderNamesDataTable.addAll(colNames);
 
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNamesDataTable);

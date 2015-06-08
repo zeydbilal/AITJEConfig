@@ -602,27 +602,24 @@ public class ObjectTree extends TreeView<JEVisObject> {
                             String objectName = table.getPairList().get(i).getKey();
                             newObject = parent.buildObject(objectName, table.getCreateClass());
                             newObject.commit();
-                            //TODO
-                            //FIXME
+                            //TODO a Data-Object
+                            JEVisUnit.Prefix prefixDisplayUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(1));
+                            JEVisUnit.Prefix prefixInputUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(4));
 
-                            JEVisUnit.Prefix prefixDisplayUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(2));
-                            JEVisUnit.Prefix prefixInputUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(5));
-
-                            String displaySymbol = table.getPairList().get(i).getValue().get(1);
-                            String inputSymbol = table.getPairList().get(i).getValue().get(4);
+                            String displaySymbol = table.getPairList().get(i).getValue().get(0);
+                            String inputSymbol = table.getPairList().get(i).getValue().get(3);
 
                             JEVisAttribute attributeValue = newObject.getAttribute("Value");
                             attributeValue.setDisplayUnit(new JEVisUnitImp(Unit.valueOf(displaySymbol), "", prefixDisplayUnit));
                             attributeValue.setInputUnit(new JEVisUnitImp(Unit.valueOf(inputSymbol), "", prefixInputUnit));
 
-                            String displaySampleRate = table.getPairList().get(i).getValue().get(3);
-                            String inputSampleRate = table.getPairList().get(i).getValue().get(6);
+                            String displaySampleRate = table.getPairList().get(i).getValue().get(2);
+                            String inputSampleRate = table.getPairList().get(i).getValue().get(5);
 
                             attributeValue.setDisplaySampleRate(Period.parse(displaySampleRate));
                             attributeValue.setInputSampleRate(Period.parse(inputSampleRate));
 
                             attributeValue.commit();
-
                         } else {
                             String objectName = table.getPairList().get(i).getKey();
                             newObject = parent.buildObject(objectName, table.getCreateClass());
