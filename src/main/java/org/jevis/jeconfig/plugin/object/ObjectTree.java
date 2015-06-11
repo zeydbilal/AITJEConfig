@@ -603,11 +603,11 @@ public class ObjectTree extends TreeView<JEVisObject> {
                             newObject = parent.buildObject(objectName, table.getCreateClass());
                             newObject.commit();
                             //TODO a Data-Object
-                            JEVisUnit.Prefix prefixDisplayUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(1));
-                            JEVisUnit.Prefix prefixInputUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(4));
+                            JEVisUnit.Prefix prefixDisplayUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(0));
+                            JEVisUnit.Prefix prefixInputUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(3));
 
-                            String displaySymbol = table.getPairList().get(i).getValue().get(0);
-                            String inputSymbol = table.getPairList().get(i).getValue().get(3);
+                            String displaySymbol = table.getPairList().get(i).getValue().get(1);
+                            String inputSymbol = table.getPairList().get(i).getValue().get(4);
 
                             JEVisAttribute attributeValue = newObject.getAttribute("Value");
                             attributeValue.setDisplayUnit(new JEVisUnitImp(Unit.valueOf(displaySymbol), "", prefixDisplayUnit));

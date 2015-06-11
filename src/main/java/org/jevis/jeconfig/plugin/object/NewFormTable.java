@@ -22,6 +22,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -38,6 +39,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.jevis.api.JEVisClass;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
+import org.jevis.api.JEVisUnit;
 import org.jevis.jeconfig.tool.ImageConverter;
 
 /**
@@ -62,6 +64,7 @@ public class NewFormTable {
     private ObservableList<String> columnHeaderNames = FXCollections.observableArrayList();
     private ObservableList<String> columnHeaderNamesDataTable = FXCollections.observableArrayList();
     private ObservableList<Pair<String, ArrayList<String>>> pairList = FXCollections.observableArrayList();
+    private ObservableList<String> listUnits = FXCollections.observableArrayList();
 
     class CreateNewTable {
 
@@ -156,7 +159,7 @@ public class NewFormTable {
                                 box.getChildren().setAll(icon, cName);
 
                             } catch (JEVisException ex) {
-                                Logger.getLogger(NewFormDialog.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(NewFormTable.class.getName()).log(Level.SEVERE, null, ex);
                             }
 
                             setGraphic(box);
@@ -175,9 +178,12 @@ public class NewFormTable {
         classComboBox.getSelectionModel().selectFirst();
         createClass = classComboBox.getSelectionModel().getSelectedItem();
 
+        Button createBtn = new Button("Create Structure");
+        Button cancelBtn = new Button("Cancel");
+
         try {
             if (createClass.getName().equals("Data")) {
-                createNewDataTable = new CreateNewDataTable();
+                createNewDataTable = new CreateNewDataTable(createBtn);
             } else {
                 createNewTable = new CreateNewTable();
             }
@@ -187,15 +193,18 @@ public class NewFormTable {
 
         BorderPane root = new BorderPane();
 
-        Button create = new Button("Create Structure");
+        HBox hBoxTop = new HBox();
+        hBoxTop.getChildren().addAll(classComboBox);
+        root.setTop(hBoxTop);
 
-        Button cancel = new Button("Cancel");
-        HBox hbox = new HBox();
-        hbox.getChildren().addAll(classComboBox, create, cancel);
-        root.setTop(hbox);
-        //remove it
+        HBox hBoxBottom = new HBox();
+        hBoxBottom.getChildren().addAll(createBtn, cancelBtn);
+        hBoxBottom.setAlignment(Pos.BASELINE_RIGHT);
+        root.setBottom(hBoxBottom);
+
         root.setCenter(spv);
         Scene scene = new Scene(root);
+        scene.getStylesheets().add("styles/Table.css");
 
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), new Runnable() {
 
@@ -224,7 +233,7 @@ public class NewFormTable {
                             int col = currentColumn;
                             for (int i = 0; i < parseWord.length; i++) {
                                 SpreadsheetCell spc = rows.get(currentRow).get(col);
-                                grid.setCellValue(currentRow, col, spc.getCellType().convertValue(parseWord[i]));
+                                grid.setCellValue(currentRow, col, spc.getCellType().convertValue(parseWord[i].trim()));
                                 col++;
                             }
                             currentRow++;
@@ -239,14 +248,14 @@ public class NewFormTable {
             }
         });
 
-        create.setOnAction(new EventHandler<ActionEvent>() {
+        createBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
                 stage.close();
                 for (int i = 0; i < grid.getRowCount(); i++) {
                     SpreadsheetCell spcObjectName = rows.get(i).get(0);
-                    if (!spcObjectName.getText().equals("")) {
 
+                    if (!spcObjectName.getText().equals("")) {
                         ArrayList<String> attributs = new ArrayList<>();
                         for (int j = 1; j < grid.getColumnCount(); j++) {
                             SpreadsheetCell spcAttribut = rows.get(i).get(j);
@@ -255,12 +264,11 @@ public class NewFormTable {
                         pairList.add(new Pair(spcObjectName.getText(), attributs));
                     }
                 }
-
                 response = Response.YES;
             }
         });
 
-        cancel.setOnAction(new EventHandler<ActionEvent>() {
+        cancelBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
                 stage.close();
@@ -280,7 +288,7 @@ public class NewFormTable {
                     createClass = classComboBox.getSelectionModel().getSelectedItem();
 
                     if (createClass.getName().equals("Data")) {
-                        createNewDataTable = new CreateNewDataTable();
+                        createNewDataTable = new CreateNewDataTable(createBtn);
                         root.setCenter(spv);
                     } else {
                         createNewTable = new CreateNewTable();
@@ -289,11 +297,10 @@ public class NewFormTable {
                 } catch (JEVisException ex) {
                     Logger.getLogger(NewFormTable.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
             }
         });
 
-        stage.setTitle("New Form");
+        stage.setTitle("Bulk Create");
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(owner);
         stage.setScene(scene);
@@ -322,10 +329,19 @@ public class NewFormTable {
         return columnHeaderNames;
     }
 
+    private void addListUnits() {
+        JEVisUnit.Prefix[] prefixes = JEVisUnit.Prefix.values();
+
+        for (int i = 0; i < prefixes.length; i++) {
+            String strPrefix = prefixes[i].toString();
+            listUnits.add(strPrefix);
+        }
+    }
+
     class CreateNewDataTable {
 
-        public CreateNewDataTable() {
-            String[] colNames = {"Object Name", "Display Symbol", "Display Prefix", "Display Sample Rate", "Input Symbol", "Input Prefix", "Input Sample Rate"};
+        public CreateNewDataTable(Button createBtn) {
+            String[] colNames = {"Object Name", "Display Prefix", "Display Symbol", "Display Sample Rate", "Input Prefix", "Input Symbol", "Input Sample Rate"};
             rowCount = 1000;
             columnCount = colNames.length;
 
@@ -355,6 +371,75 @@ public class NewFormTable {
             columnHeaderNamesDataTable.addAll(colNames);
 
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNamesDataTable);
+
+            //Display Prefix Input Control
+            createBtn.setDisable(true);
+            addListUnits();
+            spv.addEventHandler(KeyEvent.ANY, new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    ObservableList<String> colDisplayPrefix = FXCollections.observableArrayList();
+                    colDisplayPrefix.clear();
+
+                    for (int i = 0; i < grid.getRowCount(); i++) {
+                        SpreadsheetCell spc = rows.get(i).get(1);
+                        if (!spc.getText().equals("")) {
+                            colDisplayPrefix.add(spc.getText());
+                        }
+                    }
+
+                    if (colDisplayPrefix.size()!=0 && listUnits.containsAll(colDisplayPrefix)) {
+                        createBtn.setDisable(false);
+                    } else {
+                        createBtn.setDisable(true);
+                    }
+
+                    for (int i = 0; i < grid.getRowCount(); i++) {
+                        SpreadsheetCell spc = rows.get(i).get(1);
+                        if (!spc.getText().equals("")) {
+                            if (listUnits.contains(spc.getText())) {
+                                spc.getStyleClass().remove("spreadsheet-cell-error");
+                            } else {
+                                spc.getStyleClass().add("spreadsheet-cell-error");
+                            }
+                        }
+                    }
+                }
+            });
+            spv.addEventHandler(KeyEvent.ANY, new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    ObservableList<String> colInputPrefix = FXCollections.observableArrayList();
+                    colInputPrefix.clear();
+
+                    for (int i = 0; i < grid.getRowCount(); i++) {
+                        SpreadsheetCell spc = rows.get(i).get(4);
+                        if (!spc.getText().equals("")) {
+                            colInputPrefix.add(spc.getText());
+                        }
+                    }
+
+                    if (colInputPrefix.size()!=0 && listUnits.containsAll(colInputPrefix)) {
+                        createBtn.setDisable(false);
+                    } else {
+                        createBtn.setDisable(true);
+                    }
+
+                    for (int i = 0; i < grid.getRowCount(); i++) {
+                        SpreadsheetCell spc = rows.get(i).get(4);
+                        if (!spc.getText().equals("")) {
+                            if (listUnits.contains(spc.getText())) {
+                                spc.getStyleClass().remove("spreadsheet-cell-error");
+                            } else {
+                                spc.getStyleClass().add("spreadsheet-cell-error");
+                            }
+                        }
+                    }
+                }
+            });
+            
+            //TODO Mouse event
+            
         }
     }
 }
