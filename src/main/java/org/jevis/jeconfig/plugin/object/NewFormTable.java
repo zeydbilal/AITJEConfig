@@ -112,7 +112,7 @@ public class NewFormTable {
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNames);
         }
     }
-
+ 
     public static enum Type {
 
         NEW, RENAME
@@ -352,7 +352,6 @@ public class NewFormTable {
                 for (int column = 0; column < grid.getColumnCount(); ++column) {
                     cells.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
                 }
-
                 rows.add(cells);
             }
             grid.setRows(rows);
@@ -372,74 +371,63 @@ public class NewFormTable {
 
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNamesDataTable);
 
-            //Display Prefix Input Control
+            //Prefix Key Input Control
             createBtn.setDisable(true);
             addListUnits();
-            spv.addEventHandler(KeyEvent.ANY, new EventHandler<KeyEvent>() {
+            spv.addEventHandler(KeyEvent.ANY, new EventHandler<KeyEvent>() {      
                 @Override
                 public void handle(KeyEvent event) {
-                    ObservableList<String> colDisplayPrefix = FXCollections.observableArrayList();
-                    colDisplayPrefix.clear();
+                    ObservableList<String> listPrefix = FXCollections.observableArrayList();
 
                     for (int i = 0; i < grid.getRowCount(); i++) {
-                        SpreadsheetCell spc = rows.get(i).get(1);
-                        if (!spc.getText().equals("")) {
-                            colDisplayPrefix.add(spc.getText());
+                        SpreadsheetCell spcDisplayPrefix = rows.get(i).get(1);
+                        if (!spcDisplayPrefix.getText().equals("")) {
+                            listPrefix.add(spcDisplayPrefix.getText());
+                        }
+                    }
+                    for (int i = 0; i < grid.getRowCount(); i++) {
+                        SpreadsheetCell spcInputPrefix = rows.get(i).get(4);
+                        if (!spcInputPrefix.getText().equals("")) {
+                            listPrefix.add(spcInputPrefix.getText());
                         }
                     }
 
-                    if (colDisplayPrefix.size()!=0 && listUnits.containsAll(colDisplayPrefix)) {
+                    if (listUnits.containsAll(listPrefix)) {
                         createBtn.setDisable(false);
                     } else {
                         createBtn.setDisable(true);
                     }
 
                     for (int i = 0; i < grid.getRowCount(); i++) {
-                        SpreadsheetCell spc = rows.get(i).get(1);
-                        if (!spc.getText().equals("")) {
-                            if (listUnits.contains(spc.getText())) {
-                                spc.getStyleClass().remove("spreadsheet-cell-error");
-                            } else {
-                                spc.getStyleClass().add("spreadsheet-cell-error");
+                        SpreadsheetCell spcDisplayPrefix = rows.get(i).get(1);
+                        if (!spcDisplayPrefix.getText().equals("")) {
+                            if(!listUnits.contains(spcDisplayPrefix.getText())){
+                                spcDisplayPrefix.getStyleClass().add("spreadsheet-cell-error");
+                            }else{
+                                 spcDisplayPrefix.getStyleClass().remove("spreadsheet-cell-error");
                             }
+                        }else{
+                             spcDisplayPrefix.getStyleClass().remove("spreadsheet-cell-error");
                         }
                     }
+                    
+                    for (int i = 0; i < grid.getRowCount(); i++) {
+                        SpreadsheetCell spcInputPrefix = rows.get(i).get(4);
+                        if (!spcInputPrefix.getText().equals("")) {
+                            if(!listUnits.contains(spcInputPrefix.getText())){
+                                spcInputPrefix.getStyleClass().add("spreadsheet-cell-error");
+                            }else{
+                                spcInputPrefix.getStyleClass().remove("spreadsheet-cell-error");
+                            }
+                        }else{
+                            spcInputPrefix.getStyleClass().remove("spreadsheet-cell-error");
+                        }
+                    }
+                    listPrefix.clear();
                 }
             });
-            spv.addEventHandler(KeyEvent.ANY, new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
-                    ObservableList<String> colInputPrefix = FXCollections.observableArrayList();
-                    colInputPrefix.clear();
 
-                    for (int i = 0; i < grid.getRowCount(); i++) {
-                        SpreadsheetCell spc = rows.get(i).get(4);
-                        if (!spc.getText().equals("")) {
-                            colInputPrefix.add(spc.getText());
-                        }
-                    }
-
-                    if (colInputPrefix.size()!=0 && listUnits.containsAll(colInputPrefix)) {
-                        createBtn.setDisable(false);
-                    } else {
-                        createBtn.setDisable(true);
-                    }
-
-                    for (int i = 0; i < grid.getRowCount(); i++) {
-                        SpreadsheetCell spc = rows.get(i).get(4);
-                        if (!spc.getText().equals("")) {
-                            if (listUnits.contains(spc.getText())) {
-                                spc.getStyleClass().remove("spreadsheet-cell-error");
-                            } else {
-                                spc.getStyleClass().add("spreadsheet-cell-error");
-                            }
-                        }
-                    }
-                }
-            });
-            
             //TODO Mouse event
-            
         }
     }
 }
