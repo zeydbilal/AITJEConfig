@@ -147,24 +147,12 @@
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>8.20.9-SNAPSHOT</version>
-        </dependency>        
+            <version>8.40.9</version>
+        </dependency>      
         <dependency>
             <groupId>com.jidesoft</groupId>
             <artifactId>jidefx-fields</artifactId>
             <version>0.9.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>3.11</version>
-        </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots />
-        </repository>
-    </repositories>
 </project>

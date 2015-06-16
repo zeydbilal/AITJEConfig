@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -23,6 +24,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -32,6 +34,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import org.controlsfx.control.spreadsheet.GridBase;
+import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
@@ -112,7 +115,7 @@ public class NewFormTable {
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNames);
         }
     }
- 
+
     public static enum Type {
 
         NEW, RENAME
@@ -211,7 +214,6 @@ public class NewFormTable {
             @Override
             public void run() {
                 try {
-                    //FIXME
                     Clipboard clipboard = Clipboard.getSystemClipboard();
 
                     if (clipboard.hasString()) {
@@ -366,17 +368,18 @@ public class NewFormTable {
 
             spv.setEditable(true);
             spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
             columnHeaderNamesDataTable.addAll(colNames);
 
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNamesDataTable);
 
-            //Prefix Key Input Control
             createBtn.setDisable(true);
             addListUnits();
-            spv.addEventHandler(KeyEvent.ANY, new EventHandler<KeyEvent>() {      
+
+            ////GridChange Event for Prefix Input Control
+            spv.getGrid().addEventHandler(GridChange.GRID_CHANGE_EVENT, new EventHandler<GridChange>() {
+
                 @Override
-                public void handle(KeyEvent event) {
+                public void handle(GridChange event) {
                     ObservableList<String> listPrefix = FXCollections.observableArrayList();
 
                     for (int i = 0; i < grid.getRowCount(); i++) {
@@ -401,33 +404,35 @@ public class NewFormTable {
                     for (int i = 0; i < grid.getRowCount(); i++) {
                         SpreadsheetCell spcDisplayPrefix = rows.get(i).get(1);
                         if (!spcDisplayPrefix.getText().equals("")) {
-                            if(!listUnits.contains(spcDisplayPrefix.getText())){
+                            if (!listUnits.contains(spcDisplayPrefix.getText())) {
                                 spcDisplayPrefix.getStyleClass().add("spreadsheet-cell-error");
-                            }else{
-                                 spcDisplayPrefix.getStyleClass().remove("spreadsheet-cell-error");
+                            } else {
+                                spcDisplayPrefix.getStyleClass().remove("spreadsheet-cell-error");
                             }
-                        }else{
-                             spcDisplayPrefix.getStyleClass().remove("spreadsheet-cell-error");
+                        } else {
+                            spcDisplayPrefix.getStyleClass().remove("spreadsheet-cell-error");
                         }
                     }
-                    
+
                     for (int i = 0; i < grid.getRowCount(); i++) {
                         SpreadsheetCell spcInputPrefix = rows.get(i).get(4);
                         if (!spcInputPrefix.getText().equals("")) {
-                            if(!listUnits.contains(spcInputPrefix.getText())){
+                            if (!listUnits.contains(spcInputPrefix.getText())) {
                                 spcInputPrefix.getStyleClass().add("spreadsheet-cell-error");
-                            }else{
+                            } else {
                                 spcInputPrefix.getStyleClass().remove("spreadsheet-cell-error");
                             }
-                        }else{
+                        } else {
                             spcInputPrefix.getStyleClass().remove("spreadsheet-cell-error");
                         }
                     }
                     listPrefix.clear();
                 }
             });
-
-            //TODO Mouse event
         }
+        
+    }
+    public void ddsd(){
+        
     }
 }
