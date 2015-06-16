@@ -590,11 +590,10 @@ public class ObjectTree extends TreeView<JEVisObject> {
     }
 
     //@AITBilal - Erstelle ein neues Fom-Object!
-    public void fireEventNewFormTable(final JEVisObject parent) {
+    public void fireEventNewFormTable(final JEVisObject parent) throws JEVisException {
         NewFormTable table = new NewFormTable();
         if (parent != null) {
             if (table.show(JEConfig.getStage(), null, parent, false, NewFormTable.Type.NEW, null) == NewFormTable.Response.YES) {
-
                 for (int i = 0; i < table.getPairList().size(); i++) {
                     JEVisObject newObject = null;
                     try {
@@ -602,22 +601,38 @@ public class ObjectTree extends TreeView<JEVisObject> {
                             String objectName = table.getPairList().get(i).getKey();
                             newObject = parent.buildObject(objectName, table.getCreateClass());
                             newObject.commit();
-                            //TODO a Data-Object
-                            JEVisUnit.Prefix prefixDisplayUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(0));
-                            JEVisUnit.Prefix prefixInputUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(3));
-
-                            String displaySymbol = table.getPairList().get(i).getValue().get(1);
-                            String inputSymbol = table.getPairList().get(i).getValue().get(4);
 
                             JEVisAttribute attributeValue = newObject.getAttribute("Value");
-                            attributeValue.setDisplayUnit(new JEVisUnitImp(Unit.valueOf(displaySymbol), "", prefixDisplayUnit));
-                            attributeValue.setInputUnit(new JEVisUnitImp(Unit.valueOf(inputSymbol), "", prefixInputUnit));
 
-                            String displaySampleRate = table.getPairList().get(i).getValue().get(2);
-                            String inputSampleRate = table.getPairList().get(i).getValue().get(5);
+                            if (table.getPairList().get(i).getValue().get(0).isEmpty() && table.getPairList().get(i).getValue().get(1).isEmpty()) {
+                                attributeValue.setDisplayUnit(new JEVisUnitImp("", "", JEVisUnit.Prefix.NONE));
+                            } else {
+                                String displaySymbol = table.getPairList().get(i).getValue().get(1);
+                                JEVisUnit.Prefix prefixDisplayUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(0));
+                                attributeValue.setDisplayUnit(new JEVisUnitImp(Unit.valueOf(displaySymbol), "", prefixDisplayUnit));
+                            }
 
-                            attributeValue.setDisplaySampleRate(Period.parse(displaySampleRate));
-                            attributeValue.setInputSampleRate(Period.parse(inputSampleRate));
+                            if (table.getPairList().get(i).getValue().get(3).isEmpty() && table.getPairList().get(i).getValue().get(4).isEmpty()) {
+                                attributeValue.setDisplayUnit(new JEVisUnitImp("", "", JEVisUnit.Prefix.NONE));
+                            } else {
+                                String inputSymbol = table.getPairList().get(i).getValue().get(4);
+                                JEVisUnit.Prefix prefixInputUnit = JEVisUnit.Prefix.valueOf(table.getPairList().get(i).getValue().get(3));
+                                attributeValue.setInputUnit(new JEVisUnitImp(Unit.valueOf(inputSymbol), "", prefixInputUnit));
+                            }
+
+                            if (table.getPairList().get(i).getValue().get(2).isEmpty()) {
+                                attributeValue.setDisplaySampleRate(Period.parse("PT0S"));
+                            } else {
+                                String displaySampleRate = table.getPairList().get(i).getValue().get(2);
+                                attributeValue.setDisplaySampleRate(Period.parse(displaySampleRate));
+                            }
+
+                            if (table.getPairList().get(i).getValue().get(5).isEmpty()) {
+                                attributeValue.setInputSampleRate(Period.parse("PT0S"));
+                            } else {
+                                String inputSampleRate = table.getPairList().get(i).getValue().get(5);
+                                attributeValue.setInputSampleRate(Period.parse(inputSampleRate));
+                            }
 
                             attributeValue.commit();
                         } else {

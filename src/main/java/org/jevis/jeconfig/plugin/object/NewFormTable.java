@@ -385,11 +385,11 @@ public class NewFormTable {
             columnHeaderNamesDataTable.addAll(colNames);
 
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNamesDataTable);
-
+            //change it
             createBtn.setDisable(true);
             addUnits();
             addSymbols();
-            ////GridChange Event for Prefix and Symbol Input Control
+            //GridChange Event for Prefix and Symbol Input Control
             spv.getGrid().addEventHandler(GridChange.GRID_CHANGE_EVENT, new EventHandler<GridChange>() {
 
                 @Override
