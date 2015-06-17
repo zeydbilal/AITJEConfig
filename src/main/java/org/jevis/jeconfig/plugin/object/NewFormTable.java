@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -394,15 +396,18 @@ public class NewFormTable {
 
                 @Override
                 public void handle(GridChange event) {
-                    symbolAndPrefixControl(createBtn);
+                    inputControl(createBtn);
                 }
             });
         }
     }
 
-    public void symbolAndPrefixControl(Button createBtn) {
+    public void inputControl(Button createBtn) {
         ObservableList<String> listPrefix = FXCollections.observableArrayList();
         ObservableList<String> listSymbols = FXCollections.observableArrayList();
+        ObservableList<String> listSampleRateControl = FXCollections.observableArrayList();
+
+        Pattern pattern = Pattern.compile("[P]([0-9]*[M])?([0-9][W])?[T]([0-9]*[H])?([0-9]*[M])?([0-9]*[S])?");
 
         for (int i = 0; i < grid.getRowCount(); i++) {
             SpreadsheetCell spcDisplayPrefix = rows.get(i).get(1);
@@ -429,7 +434,26 @@ public class NewFormTable {
             }
         }
 
-        if (listUnits.containsAll(listPrefix) && listUnitSymbols.containsAll(listSymbols)) {
+        for (int i = 0; i < grid.getRowCount(); i++) {
+            SpreadsheetCell spcDisplaySampleRate = rows.get(i).get(3);
+            if (!spcDisplaySampleRate.getText().equals("")) {
+                Matcher matcher = pattern.matcher(spcDisplaySampleRate.getText());
+                if (!matcher.matches()) {
+                    listSampleRateControl.add(spcDisplaySampleRate.getText());
+                }
+            }
+        }
+        for (int i = 0; i < grid.getRowCount(); i++) {
+            SpreadsheetCell spcInputSampleRate = rows.get(i).get(6);
+            if (!spcInputSampleRate.getText().equals("")) {
+                Matcher matcher = pattern.matcher(spcInputSampleRate.getText());
+                if (!matcher.matches()) {
+                    listSampleRateControl.add(spcInputSampleRate.getText());
+                }
+            }
+        }
+
+        if (listUnits.containsAll(listPrefix) && listUnitSymbols.containsAll(listSymbols) && listSampleRateControl.isEmpty()) {
             createBtn.setDisable(false);
         } else {
             createBtn.setDisable(true);
@@ -485,7 +509,37 @@ public class NewFormTable {
                 spcInputSymbol.getStyleClass().remove("spreadsheet-cell-error");
             }
         }
+
+        for (int i = 0; i < grid.getRowCount(); i++) {
+            SpreadsheetCell spcDisplaySampleRate = rows.get(i).get(3);
+            Matcher matcher = pattern.matcher(spcDisplaySampleRate.getText());
+            if (!spcDisplaySampleRate.getText().equals("")) {
+                if (!matcher.matches()) {
+                    spcDisplaySampleRate.getStyleClass().add("spreadsheet-cell-error");
+                } else {
+                    spcDisplaySampleRate.getStyleClass().remove("spreadsheet-cell-error");
+                }
+            } else {
+                spcDisplaySampleRate.getStyleClass().remove("spreadsheet-cell-error");
+            }
+        }
+
+        for (int i = 0; i < grid.getRowCount(); i++) {
+            SpreadsheetCell spcInputSampleRate = rows.get(i).get(6);
+            Matcher matcher = pattern.matcher(spcInputSampleRate.getText());
+            if (!spcInputSampleRate.getText().equals("")) {
+                if (!matcher.matches()) {
+                    spcInputSampleRate.getStyleClass().add("spreadsheet-cell-error");
+                } else {
+                    spcInputSampleRate.getStyleClass().remove("spreadsheet-cell-error");
+                }
+            } else {
+                spcInputSampleRate.getStyleClass().remove("spreadsheet-cell-error");
+            }
+        }
+
         listSymbols.clear();
         listPrefix.clear();
+        listSampleRateControl.clear();
     }
 }

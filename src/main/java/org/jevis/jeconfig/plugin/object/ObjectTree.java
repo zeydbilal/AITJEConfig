@@ -621,14 +621,14 @@ public class ObjectTree extends TreeView<JEVisObject> {
                             }
 
                             if (table.getPairList().get(i).getValue().get(2).isEmpty()) {
-                                attributeValue.setDisplaySampleRate(Period.parse("PT0S"));
+                                attributeValue.setDisplaySampleRate(Period.parse("PT0S"));//Period.ZERO
                             } else {
                                 String displaySampleRate = table.getPairList().get(i).getValue().get(2);
                                 attributeValue.setDisplaySampleRate(Period.parse(displaySampleRate));
                             }
 
                             if (table.getPairList().get(i).getValue().get(5).isEmpty()) {
-                                attributeValue.setInputSampleRate(Period.parse("PT0S"));
+                                attributeValue.setInputSampleRate(Period.parse("PT0S"));//Period.ZERO
                             } else {
                                 String inputSampleRate = table.getPairList().get(i).getValue().get(5);
                                 attributeValue.setInputSampleRate(Period.parse(inputSampleRate));
