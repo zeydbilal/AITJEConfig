@@ -64,7 +64,6 @@ public class NewFormTable {
     private LinkedList<String> listObjectNames = new LinkedList<>();
     private int rowCount;
     private int columnCount;
-    private CreateNewTable createNewTable;
     private CreateNewDataTable createNewDataTable;
     private ObservableList<String> columnHeaderNames = FXCollections.observableArrayList();
     private ObservableList<String> columnHeaderNamesDataTable = FXCollections.observableArrayList();
@@ -191,7 +190,7 @@ public class NewFormTable {
             if (createClass.getName().equals("Data")) {
                 createNewDataTable = new CreateNewDataTable(createBtn);
             } else {
-                createNewTable = new CreateNewTable();
+                new CreateNewTable();
             }
         } catch (JEVisException ex) {
             Logger.getLogger(NewFormTable.class.getName()).log(Level.SEVERE, null, ex);
@@ -296,7 +295,7 @@ public class NewFormTable {
                         createNewDataTable = new CreateNewDataTable(createBtn);
                         root.setCenter(spv);
                     } else {
-                        createNewTable = new CreateNewTable();
+                        new CreateNewTable();
                         root.setCenter(spv);
                     }
                 } catch (JEVisException ex) {
@@ -344,16 +343,15 @@ public class NewFormTable {
     }
 
     public void addSymbols() {
-        // Indische währungssymbol nicht in der Liste ("₦","Wahrungssymbol",)
+        // Indische Währungssymbol nicht in der Liste ("₦","..",)
         listUnitSymbols.addAll("m/s²",
-                "g", "mol", "atom", "rad", "bit", "%", "centiradian", "dB", "°", "grade", "'", "byte", "rev", "¨", "sphere", "sr", "rad/s²", "rad/s", "Bq", "Ci", "Hz", "Rd",
-                "m²", "a", "ha", "cm²", "km²", "kat", "€", "₦", "$", "*?*", "¥", "Hits/cm²", "Hits/m²", "Ω/cm²", "dB", "bit/s", "Bq", "Ci", "Hz",
-                "Rd", "-", "dB", "s", "m", "h", "day", "day_sidereal", "week", "month", "year", "year_calendar", "year_sidereal", "g/(cms)", "F", "C", "e", "Fd", "Fr", "S", "A",
-                "Gi", "H", "V", "Ω", "J", "eV", "erg", "N", "dyn", "kgf", "lbf", "Hz", "Bq", "Ci", "Rd", "lx", "La", "W/m²", "m²/s", "cm²/s", "m", "Å", "ua", "cm", "foot_survey_us",
-                "ft", "in", "km", "ly", "mi", "mm", "nmi", "pc", "pixel", "pt", "yd", "lm", "cd", "hp", "cd", "hp", "lm", "W", "Wb", "Mx", "T", "G", "kg", "u", "me", "t", "oz", "lb",
-                "ton_uk", "ton_us", "kg/s", "cd", "hp", "lm", "var", "Pa", "atm", "bar", "in Hg", "mmHg", "Gy", "rd", "rem", "Sv", "Sv", "Gy", "rd", "rem", "Bq", "Ci", "Hz",
-                "Rd", "rev/s", "dB", "grade", "K", "℃", "°F", "°R", "Nm", "eV", "erg", "J", "Wh", "Ws", "m/s", "c", "km/h", "kn", "Mach", "mph", "m³", "in³", "gallon_dry_us",
-                "gal", "gallon_uk", "l", "oz_uk", "oz", "kg/m³", "m³/s");
+                "g", "mol", "atom", "rad", "bit", "%", "centiradian", "dB", "°", "'", "byte", "rev", "¨", "sphere", "sr", "rad/s²", "rad/s", "Bq", "Ci", "Hz",
+                "m²", "a", "ha", "cm²", "km²", "kat", "€", "₦", "$", "*?*", "¥", "Hits/cm²", "Hits/m²", "Ω/cm²", "bit/s", "-", "s", "m", "h", "day", "day_sidereal",
+                "week", "month", "year", "year_calendar", "year_sidereal", "g/(cms)", "F", "C", "e", "Fd", "Fr", "S", "A", "Gi", "H", "V", "Ω", "J",
+                "eV", "erg", "N", "dyn", "kgf", "lbf", "lx", "La", "W/m²", "m²/s", "cm²/s", "Å", "ua", "cm", "foot_survey_us", "ft", "in", "km", "ly",
+                "mi", "mm", "nmi", "pc", "pixel", "pt", "yd", "W", "Wb", "Mx", "T", "G", "kg", "u", "me", "t", "oz", "lb", "ton_uk", "ton_us", "kg/s",
+                "cd", "hp", "lm", "var", "Pa", "atm", "bar", "in Hg", "mmHg", "Gy", "rem", "Sv", "rd", "Rd", "rev/s", "grade", "K", "℃", "°F", "°R",
+                "Nm", "Wh", "Ws", "m/s", "c", "km/h", "kn", "Mach", "mph", "m³", "in³", "gallon_dry_us", "gal", "gallon_uk", "l", "oz_uk", "kg/m³", "m³/s");
     }
 
     class CreateNewDataTable {
@@ -407,7 +405,7 @@ public class NewFormTable {
         ObservableList<String> listSymbols = FXCollections.observableArrayList();
         ObservableList<String> listSampleRateControl = FXCollections.observableArrayList();
 
-        Pattern pattern = Pattern.compile("[P]([0-9]*[M])?([0-9][W])?[T]([0-9]*[H])?([0-9]*[M])?([0-9]*[S])?");
+        Pattern pattern = Pattern.compile("[P]([0-9]+[M])?([0-9][W])?[T]([0-9]+[H])?([0-9]+[M])?([0-9]+[S])?");
 
         for (int i = 0; i < grid.getRowCount(); i++) {
             SpreadsheetCell spcDisplayPrefix = rows.get(i).get(1);
