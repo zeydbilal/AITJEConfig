@@ -25,12 +25,14 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 import org.jevis.api.JEVisDataSource;
 import org.jevis.jeconfig.Constants;
 import org.jevis.jeconfig.JEConfig;
@@ -86,33 +88,28 @@ public class GraphPlugin implements Plugin {
     @Override
     public Node getConntentNode() {
         if (border == null) {
-
-            BorderPane _view = new BorderPane();
-
-//            final NumberAxis xAxis = new NumberAxis();
-//            final NumberAxis yAxis = new NumberAxis();
-            ObservableList<XYChart.Series<Date, Number>> series = FXCollections.observableArrayList();
-
-            ObservableList<XYChart.Data<Date, Number>> series1Data = FXCollections.observableArrayList();
-            series1Data.add(new XYChart.Data<>(new GregorianCalendar(2012, 11, 15).getTime(), 2));
-            series1Data.add(new XYChart.Data<>(new GregorianCalendar(2014, 5, 3).getTime(), 4));
-
-//            ObservableList<XYChart.Data<Date, Number>> series2Data = FXCollections.observableArrayList();
-//            series2Data.add(new XYChart.Data<>(new GregorianCalendar(2014, 0, 13).getTime(), 8));
-//            series2Data.add(new XYChart.Data<>(new GregorianCalendar(2014, 7, 27).getTime(), 4));
-            series.add(new XYChart.Series<>("Series1", series1Data));
-//            series.add(new XYChart.Series<>("Series2", series2Data));
-
-            NumberAxis numberAxis = new NumberAxis();
-//            DateAxis dateAxis = new DateAxis();
-//            LineChart<Date, Number> lineChart = new LineChart(dateAxis, numberAxis, series);
-
             border = new BorderPane();
+
+            final SwingNode swingNode = new SwingNode();
+
+            createSwingContent(swingNode);
+
+            border.setCenter(swingNode);
+
 //            border.setCenter(lineChart);
             border.setStyle("-fx-background-color: " + Constants.Color.LIGHT_GREY2);
         }
 
         return border;
+    }
+
+    private void createSwingContent(final SwingNode swingNode) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                swingNode.setContent(new JButton("Click me!"));
+            }
+        });
     }
 
     @Override
