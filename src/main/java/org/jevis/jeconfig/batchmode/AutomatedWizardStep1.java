@@ -23,6 +23,7 @@ import org.jevis.api.JEVisObject;
 import org.jevis.jeconfig.JEConfig;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
 
+
 /**
  *
  * @author Zeyd Bilal Calis
@@ -31,7 +32,8 @@ import org.jevis.jeconfig.plugin.object.ObjectTree;
 public class AutomatedWizardStep1 extends WizardPane {
 
     private JEVisObject parentObject;
-    private TextField nameTextField;
+    private TextField newBuildingTxtf;
+    private TextField localManagerIPTxtf;
     private ObjectTree tree;
     private WizardSelectedObject wizardSelectedObject;
 
@@ -44,23 +46,41 @@ public class AutomatedWizardStep1 extends WizardPane {
         setGraphic(JEConfig.getImage("create_wizard.png", 100, 100));
     }
 
-    private HBox getInit() {
+    private VBox getInit() {
         VBox vBox = new VBox();
 
-        HBox hbox = new HBox();
-        Label namelbl = new Label();
-        //Give your building name : 
-        namelbl.setText("Building name : ");
+        HBox hbox1 = new HBox();
+        HBox hbox2 = new HBox();
+        
+        Label newBuildingLbl = new Label("Building Name");
+        Label localManagerIPLbl = new Label("Local Manager IP");
+        Label sensorDBUser = new Label("DB User");
+        Label sensorDBPwd = new Label("DB Password");
+                
 
-        nameTextField = new TextField();
-        nameTextField.setPrefWidth(200);
-        hbox.setSpacing(30);
-        hbox.getChildren().addAll(namelbl, nameTextField);
-        hbox.setPadding(new Insets(200, 10, 10, 20));
+        newBuildingTxtf = new TextField();
+        //newBuildingTxtf.setPromptText("Building here");
+        newBuildingTxtf.setPrefWidth(200);
+        
+        localManagerIPTxtf = new TextField();
+        //localManagerIPTxtf.setPromptText(null);
+        localManagerIPTxtf.setPrefWidth(200);
+        
+        
+        hbox1.setSpacing(30);
+        hbox1.getChildren().addAll(newBuildingLbl, newBuildingTxtf);
+        hbox1.setPadding(new Insets(100, 10, 10, 20));
 
-        nameTextField.setPromptText("Building here");
+        hbox2.setSpacing(30);
+        hbox2.getChildren().addAll(localManagerIPLbl, localManagerIPTxtf);
+        hbox2.setPadding(new Insets(20, 10, 10, 20));
+        
+        vBox.setSpacing(30);
 
-        return hbox;
+        vBox.getChildren().addAll(hbox1, hbox2);
+        vBox.setPadding(new Insets(20, 10, 10, 20));
+        
+        return vBox;
     }
 
     @Override
@@ -84,6 +104,7 @@ public class AutomatedWizardStep1 extends WizardPane {
 
     public void commitObject() {
 
+        
         JEVisClass buildingClass = null;
         List<JEVisClass> listClasses = null;
         try {
@@ -96,7 +117,8 @@ public class AutomatedWizardStep1 extends WizardPane {
                 }
             }
             //Create Building object
-            JEVisObject newObject = getParentObject().buildObject(nameTextField.getText(), buildingClass);
+            
+            JEVisObject newObject = getParentObject().buildObject(newBuildingTxtf.getText(), buildingClass);
             newObject.commit();
 
             final TreeItem<JEVisObject> newTreeItem = tree.buildItem(newObject);
