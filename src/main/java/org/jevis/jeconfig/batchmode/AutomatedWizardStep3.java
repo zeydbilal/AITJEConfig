@@ -61,7 +61,7 @@ public class AutomatedWizardStep3 extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
-        setContent(getInit());
+        //setContent(getInit());
         ObservableList<ButtonType> list = getButtonTypes();
 
         for (ButtonType type : list) {

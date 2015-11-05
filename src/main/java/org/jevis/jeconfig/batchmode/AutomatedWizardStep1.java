@@ -22,18 +22,18 @@ import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.jeconfig.JEConfig;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
+import org.jevis.structurecreator.WiotechStructureCreator;
 
 
 /**
  *
  * @author Zeyd Bilal Calis
  */
- //In dieser Klasse wird ein Building ,Data Source Directory und Data Directory Objekt erzeugt.
+ //In dieser Klasse wird ein Building erzeugt.
 public class AutomatedWizardStep1 extends WizardPane {
 
     private JEVisObject parentObject;
     private TextField newBuildingTxtf;
-    private TextField localManagerIPTxtf;
     private ObjectTree tree;
     private WizardSelectedObject wizardSelectedObject;
 
@@ -46,41 +46,25 @@ public class AutomatedWizardStep1 extends WizardPane {
         setGraphic(JEConfig.getImage("create_wizard.png", 100, 100));
     }
 
-    private VBox getInit() {
-        VBox vBox = new VBox();
+    private HBox getInit() {
+        
 
-        HBox hbox1 = new HBox();
-        HBox hbox2 = new HBox();
+        HBox hbox = new HBox();
         
         Label newBuildingLbl = new Label("Building Name");
-        Label localManagerIPLbl = new Label("Local Manager IP");
-        Label sensorDBUser = new Label("DB User");
-        Label sensorDBPwd = new Label("DB Password");
                 
-
         newBuildingTxtf = new TextField();
-        //newBuildingTxtf.setPromptText("Building here");
         newBuildingTxtf.setPrefWidth(200);
         
-        localManagerIPTxtf = new TextField();
-        //localManagerIPTxtf.setPromptText(null);
-        localManagerIPTxtf.setPrefWidth(200);
-        
-        
-        hbox1.setSpacing(30);
-        hbox1.getChildren().addAll(newBuildingLbl, newBuildingTxtf);
-        hbox1.setPadding(new Insets(100, 10, 10, 20));
 
-        hbox2.setSpacing(30);
-        hbox2.getChildren().addAll(localManagerIPLbl, localManagerIPTxtf);
-        hbox2.setPadding(new Insets(20, 10, 10, 20));
-        
-        vBox.setSpacing(30);
+        hbox.setSpacing(30);
+        hbox.getChildren().addAll(newBuildingLbl, newBuildingTxtf);
+        hbox.setPadding(new Insets(100, 10, 10, 20));
 
-        vBox.getChildren().addAll(hbox1, hbox2);
-        vBox.setPadding(new Insets(20, 10, 10, 20));
         
-        return vBox;
+
+        
+        return hbox;
     }
 
     @Override
@@ -118,46 +102,28 @@ public class AutomatedWizardStep1 extends WizardPane {
             }
             //Create Building object
             
-            JEVisObject newObject = getParentObject().buildObject(newBuildingTxtf.getText(), buildingClass);
-            newObject.commit();
-
-            final TreeItem<JEVisObject> newTreeItem = tree.buildItem(newObject);
-            TreeItem<JEVisObject> parentItem = tree.getObjectTreeItem(getParentObject());
-
-            parentItem.getChildren().add(newTreeItem);
-
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    tree.getSelectionModel().select(newTreeItem);
-                }
-            });
-
-            //Speichere das neue erzeugte Building-Objekt als CurrentSelectedBuildingObject.
-            //Das brauchen wir in dem letzten Schritt. --> -> tree.expandSelected(true); 
-            wizardSelectedObject.setCurrentSelectedBuildingObject(newObject);
-
-            ObservableList<JEVisClass> allowedChildrenClasses = FXCollections.observableArrayList(newTreeItem.getValue().getAllowedChildrenClasses());
-
-            //Create Data Source Directory and Data Directory
-            if (allowedChildrenClasses.size() > 0) {
-                for (int i = 0; i < allowedChildrenClasses.size(); i++) {
-                    JEVisObject newChildObject = newTreeItem.getValue().buildObject(allowedChildrenClasses.get(i).getName(), allowedChildrenClasses.get(i));
-                    newChildObject.commit();
-                    if (allowedChildrenClasses.get(i).getName().equals("Data Directory")) {
-                        wizardSelectedObject.setCurrentDataDirectory(newChildObject);
-                    }
+            
+            JEVisObject buildingObject = null;
+            
+            // Check if the building name already exists, if not, create a new one
+            List<JEVisObject> existingChildList = getParentObject().getChildren();
+            
+            for(JEVisObject jeO : existingChildList){
+                Logger.getLogger(ManualWizardStep1.class.getName()).log(Level.SEVERE,jeO.getName());
+                if(jeO.getName().equals(newBuildingTxtf.getText())){
+                    Logger.getLogger(ManualWizardStep1.class.getName()).log(Level.SEVERE,jeO.getName()+ "in for!!!!!!!!!!!");
+                   buildingObject = jeO; 
+                   break;
                 }
             }
-
-            //Set the new parent.The new parent is Data Source Directory!
-            //We need Data Source Directory for second step
-            List<JEVisObject> listChildren = newTreeItem.getValue().getChildren();
-            for (int i = 0; i < listChildren.size(); i++) {
-                if (listChildren.get(i).getName().equals("Data Source Directory")) {
-                    wizardSelectedObject.setCurrentSelectedObject(listChildren.get(i));
-                }
+            
+            if(buildingObject == null){
+                Logger.getLogger(ManualWizardStep1.class.getName()).log(Level.SEVERE,"new created");
+                buildingObject = getParentObject().buildObject(newBuildingTxtf.getText(), buildingClass);
+                buildingObject.commit();
             }
+            
+            wizardSelectedObject.setCurrentSelectedBuildingObject(buildingObject);
 
         } catch (JEVisException ex) {
             Logger.getLogger(ManualWizardStep1.class.getName()).log(Level.SEVERE, null, ex);

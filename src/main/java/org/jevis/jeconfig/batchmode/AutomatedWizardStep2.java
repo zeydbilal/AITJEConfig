@@ -43,6 +43,7 @@ import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
 import org.jevis.jeconfig.tool.ImageConverter;
+import org.jevis.structurecreator.WiotechStructureCreator;
 import org.joda.time.DateTime;
 
 /**
@@ -62,7 +63,12 @@ public class AutomatedWizardStep2 extends WizardPane {
     private Map<String, String> map = new TreeMap<String, String>();
     //Hier wird die Verbindungsdaten(Datanbankname,Host,Port) für den HTTP-Server initialisiert.
     private SensorMap sensorMap;
-
+    
+    
+    private TextField localManagerIPTxtf;
+    private TextField databaseUserTxtf;
+    private TextField databasePwdTxtf;
+    
     public AutomatedWizardStep2(ObjectTree tree, WizardSelectedObject wizardSelectedObject, SensorMap sensorMap) {
         this.sensorMap = sensorMap;
         this.wizardSelectedObject = wizardSelectedObject;
@@ -83,28 +89,22 @@ public class AutomatedWizardStep2 extends WizardPane {
             }
         }
     }
-
+        
     @Override
     public void onExitingPage(Wizard wizard) {
         //Erzeuge das Server-Objekt
         commitServerObject();
     }
-
+       
     public void commitServerObject() {
+        WiotechStructureCreator wsc = new WiotechStructureCreator(localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", databaseUserTxtf.getText(), databasePwdTxtf.getText());
+        wsc.createStructure(tree, wizardSelectedObject.getCurrentSelectedBuildingObject());
         try {
-            //Create Server.
-            JEVisObject newObject = wizardSelectedObject.getCurrentSelectedObject().buildObject(serverNameTextField.getText(), createClass);
-            newObject.commit();
-            //Commit the Attributes
-            commitAttributes(newObject);
-
-            //wähle den Server als neue Objekt!
-            wizardSelectedObject.setCurrentSelectedObject(newObject);
-            //Set the database name 
-            sensorMap.setDatabase(databaseNameTextField.getText());
+            wizardSelectedObject.setCurrentSelectedBuildingObject(wizardSelectedObject.getCurrentSelectedBuildingObject().getChildren().get(0));
         } catch (JEVisException ex) {
             Logger.getLogger(AutomatedWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
     }
 
     public void commitAttributes(JEVisObject newObject) {
@@ -112,7 +112,7 @@ public class AutomatedWizardStep2 extends WizardPane {
             List<JEVisAttribute> attribut = newObject.getAttributes();
             ObservableList<JEVisAttribute> mylist = FXCollections.observableArrayList(attribut);
             sortTheChildren(mylist);
-
+        
             for (Map.Entry<String, String> entrySet : map.entrySet()) {
                 listBuildSample.add(entrySet.getValue());
                 // Set the host
@@ -129,12 +129,12 @@ public class AutomatedWizardStep2 extends WizardPane {
                     mylist.get(i).buildSample(new DateTime(), listBuildSample.get(i)).commit();
                 }
             }
-
+        
         } catch (JEVisException ex) {
             Logger.getLogger(AutomatedWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
-
+    }
+    
     public static void sortTheChildren(ObservableList<JEVisAttribute> list) {
         Comparator<JEVisAttribute> sort = new Comparator<JEVisAttribute>() {
             @Override
@@ -149,13 +149,13 @@ public class AutomatedWizardStep2 extends WizardPane {
     private BorderPane getInit() {
         BorderPane root = new BorderPane();
 
-        ObservableList<JEVisClass> options = FXCollections.observableArrayList();
-
-        try {
+       // ObservableList<JEVisClass> options = FXCollections.observableArrayList();
+        
+        /*try {
             options = FXCollections.observableArrayList(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses());
         } catch (JEVisException ex) {
             Logger.getLogger(AutomatedWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
         // Set the cell properties for ComboBox
         Callback<ListView<JEVisClass>, ListCell<JEVisClass>> cellFactory = new Callback<ListView<JEVisClass>, ListCell<JEVisClass>>() {
             @Override
@@ -176,7 +176,7 @@ public class AutomatedWizardStep2 extends WizardPane {
                                 Label cName = new Label(item.getName());
                                 cName.setTextFill(Color.BLACK);
                                 box.getChildren().setAll(icon, cName);
-
+        
                             } catch (JEVisException ex) {
                                 Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -187,20 +187,27 @@ public class AutomatedWizardStep2 extends WizardPane {
                 return cell;
             }
         };
+        
+       
+        
+        Label localManagerIPLbl = new Label("Local Manager IP:");
+        localManagerIPTxtf = new TextField();
+        localManagerIPTxtf.setPrefWidth(200);
+        
 
-        Label serverName = new Label();
-        serverNameTextField = new TextField();
-        serverNameTextField.setPrefWidth(200);
-        serverNameTextField.setPromptText("Server Name");
-
-        Label databaseName = new Label();
-        databaseNameTextField = new TextField();
-        databaseNameTextField.setPrefWidth(200);
-        databaseNameTextField.setPromptText("Datenbank Name");
-
+        Label databaseUserLbl = new Label("DB User");
+        databaseUserTxtf = new TextField();
+        databaseUserTxtf.setPrefWidth(200);
+        
+        Label databasePwdLbl = new Label("DB Password");
+        databasePwdTxtf = new TextField();
+        databasePwdTxtf.setPrefWidth(200);
+        
+        
+       
         ComboBox<JEVisClass> classComboBox = new ComboBox<JEVisClass>();
 
-        for (JEVisClass option : options) {
+       /* for (JEVisClass option : options) {
             try {
                 //Add only HTTP Server in to the ComboBox
                 if (option.getName().equals("HTTP Server")) {
@@ -209,8 +216,8 @@ public class AutomatedWizardStep2 extends WizardPane {
             } catch (JEVisException ex) {
                 Logger.getLogger(AutomatedWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-
+        }*/
+        
         classComboBox.setCellFactory(cellFactory);
         classComboBox.setButtonCell(cellFactory.call(null));
         classComboBox.setMinWidth(250);
@@ -218,7 +225,7 @@ public class AutomatedWizardStep2 extends WizardPane {
 
         createClass = classComboBox.getSelectionModel().getSelectedItem();
 
-        classComboBox.setOnAction(new EventHandler<ActionEvent>() {
+      /*  classComboBox.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 typeNames.clear();
@@ -234,36 +241,39 @@ public class AutomatedWizardStep2 extends WizardPane {
                 }
                 root.setCenter(getTypes());
             }
-        });
+        });*/
 
         //Get and set the typenames from a class. Typenames are for the columnnames.
-        try {
+       /* try {
             for (int i = 0; i < createClass.getTypes().size(); i++) {
                 typeNames.add(createClass.getTypes().get(i).getName());
             }
         } catch (JEVisException ex) {
             Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
 
-        serverName.setText("Server Name : ");
-        databaseName.setText("Database Name : ");
-        //Servername and ComboBox
-        HBox hBoxTopServerName = new HBox();
-        hBoxTopServerName.setSpacing(30);
-        hBoxTopServerName.getChildren().addAll(serverName, serverNameTextField, classComboBox);
-        hBoxTopServerName.setPadding(new Insets(10, 10, 10, 0));
+        
+        HBox localManagerIPhBox = new HBox();
+        localManagerIPhBox.setSpacing(30);
+        localManagerIPhBox.getChildren().addAll(localManagerIPLbl, localManagerIPTxtf);
+        localManagerIPhBox.setPadding(new Insets(10, 10, 10, 0));
 
-        HBox hBoxTopDatabaseName = new HBox();
-        hBoxTopDatabaseName.setSpacing(10);
-        hBoxTopDatabaseName.getChildren().addAll(databaseName, databaseNameTextField);
-        hBoxTopDatabaseName.setPadding(new Insets(10, 10, 10, 0));
+        HBox dbUserhBox = new HBox();
+        dbUserhBox.setSpacing(10);
+        dbUserhBox.getChildren().addAll(databaseUserLbl, databaseUserTxtf);
+        dbUserhBox.setPadding(new Insets(10, 10, 10, 0));
+        
+        HBox dbPwdhBox = new HBox();
+        dbPwdhBox.setSpacing(10);
+        dbPwdhBox.getChildren().addAll(databasePwdLbl, databasePwdTxtf);
+        dbPwdhBox.setPadding(new Insets(10, 10, 10, 0));
 
         VBox vBoxTop = new VBox();
-        vBoxTop.getChildren().addAll(hBoxTopServerName, hBoxTopDatabaseName);
+        vBoxTop.getChildren().addAll(localManagerIPhBox, dbUserhBox, dbPwdhBox);
         vBoxTop.setPadding(new Insets(10, 10, 10, 10));
         root.setTop(vBoxTop);
         root.setCenter(getTypes());
-
+       
         return root;
 
     }
@@ -271,7 +281,7 @@ public class AutomatedWizardStep2 extends WizardPane {
     //Erzeuge Label,TextField und CheckBox variablen von schon vordefinierten Typen.
     public GridPane getTypes() {
         GridPane gridpane = new GridPane();
-
+    
         for (int i = 0; i < typeNames.size(); i++) {
             Label label = new Label(typeNames.get(i) + " : ");
             try {
@@ -287,7 +297,7 @@ public class AutomatedWizardStep2 extends WizardPane {
                         @Override
                         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                             map.put(textField.getId(), textField.getText());
-                        }
+}
                     });
                     gridpane.addRow(i, label, textField);
                 } else {
