@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -297,6 +298,12 @@ public class AutomatedWizardStep2 extends WizardPane {
          VBox labelVBox = new VBox(doneLbl);
         gridpane.addRow(4, labelVBox);
         
+        Label errorLbl = new Label("error");
+        //errorLbl.setVisible(false);
+        //gridpane.addRow(5, errorLbl);
+        
+        root.setBottom(errorLbl);
+        
         //GridPane.setHalignment(doneLbl, HPos.CENTER);
         //GridPane.setValignment(doneLbl, VPos.CENTER);
         root.setTop(gridpane);
@@ -309,30 +316,28 @@ public class AutomatedWizardStep2 extends WizardPane {
                 gridpane.add(pb, 1, 3);
                 button.setDisable(true);
                 
-                 Runnable r = new Runnable() {
-            public void run() {
                 
-               WiotechStructureCreator wsc = new WiotechStructureCreator(localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", databaseUserTxtf.getText(), databasePwdTxtf.getText());
-               wsc.createStructure(tree, wizardSelectedObject.getCurrentSelectedBuildingObject());
-               try {
-                   wizardSelectedObject.setCurrentSelectedBuildingObject(wizardSelectedObject.getCurrentSelectedBuildingObject().getChildren().get(0));
-               } catch (JEVisException ex) {
-                   Logger.getLogger(AutomatedWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
+                
+                Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                try {  
+                    WiotechStructureCreator wsc = new WiotechStructureCreator(localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", databaseUserTxtf.getText(), databasePwdTxtf.getText());
+                    wsc.createStructure(tree, wizardSelectedObject.getCurrentSelectedBuildingObject());
+                    wizardSelectedObject.setCurrentSelectedBuildingObject(wizardSelectedObject.getCurrentSelectedBuildingObject().getChildren().get(0));
+                } catch (Exception ex) {
+                errorLbl.setText(ex.getMessage());
                }
                pb.setVisible(false);
                doneLbl.setVisible(true);
-               
-               
-              
-               
-            }
-
                     
-            
-        };
+                    
+                }
+                });
+                
+               
         
-        Thread runner = new Thread(r);
-        runner.start();
+        
                  
                 
             }

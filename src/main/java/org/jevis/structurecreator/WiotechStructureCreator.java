@@ -88,20 +88,16 @@ public class WiotechStructureCreator {
      *   }
      * 
      */
-    public WiotechStructureCreator(String host, Integer port, String schema, String dbUser, String dbPW) {
+    public WiotechStructureCreator(String host, Integer port, String schema, String dbUser, String dbPW)throws ClassNotFoundException, SQLException {
         
         this._host = host;
         this._port = port;
         this._schema = schema;
         this._dbUser = dbUser;
         this._dbPW = dbPW;
-        try {
+       
             String url = loadJDBC(_host, _port, _schema, _dbUser, _dbPW);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        url = url;
         getSensorDetails();
     }
     
