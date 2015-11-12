@@ -1,30 +1,24 @@
 /**
- * Copyright (C) 2015 Werner Lamprecht
+ * Copyright (C) 2015 WernerLamprecht <werner.lamprecht@ymail.com>
  *
- * This file is part of JEVisExample.
- *
- * JEVisExample is free software: you can redistribute it and/or modify it under
+ * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation in version 3.
  *
- * JEVisExample is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * JEVisExample. If not, see <http://www.gnu.org/licenses/>.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * JEVisExample is part of the OpenJEVis project, further project information
- * are published at <http://www.OpenJEVis.org/>.
- *
- * @author Werner Lamprecht <werner.lamprecht@ymail.com>
- * 
+ * This class is part of the OpenJEVis project, further project information are
+ * published at <http://www.OpenJEVis.org/>.
  */
 
 package org.jevis.structurecreator;
 
-import java.io.IOException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -49,6 +43,27 @@ import org.jevis.commons.unit.JEVisUnitImp;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
 import org.joda.time.DateTime;
 
+/**
+ * This class is used to automated create a JEVis structure for a Wiotech 
+ * Sensor Network. It connects to the Local Manager, reads the sensor tables
+ * and creates the needed structure in JEVis.
+ * 
+ *    /**
+     * Example how to use WiotechStructureCreator
+
+    public static void main(String[] args){
+        
+        Long buildingID = Long.parseLong(args[0]);
+        String localManagerIP = args [1];
+        String dbUser = args[2];
+        String dbPwd = args [3];
+        
+        WiotechStructureCreator wsc = new WiotechStructureCreator(localManagerIP, 
+                3306, "db_lm_cbv2", dbUser, dbPwd);
+        (only if not used within JEConfig)wsc.connectToJEVis("localhost", 
+                "3306", "jevis", "jevis", "jevistest", "Sys Admin", "jevis");
+        wsc.createStructure(buildingID);
+    }*/
 
 public class WiotechStructureCreator {
 
@@ -59,11 +74,7 @@ public class WiotechStructureCreator {
     private static String _schema;
     private static String _dbUser;
     private static String _dbPW;
-    
     private ObjectTree tree;
-    
-    
-    
     /**
      * The JEVisDataSource is the central class handling the connection to the
      * JEVis Server
@@ -72,20 +83,13 @@ public class WiotechStructureCreator {
     
     /**
      * 
-     * Reads the sensor details from the mysql db
+     * Reads the sensor details from the Wiotech mysql db on Local Manager
      * 
-     * @param host wiotech local host ip 
-     * @param port wiotech db port
-     * @param schema db schema
-     * @param dbUser user
-     * @param dbPW password
-     * 
-     *
-     *   public static void main(String[] args){
-     *       WiotechStructureCreator wsc = new WiotechStructureCreator("10.8.4.123", 3306, "db_lm_cbv2", "jevis", "jevistest");
-     *       wsc.connectToJEVis("localhost", "3306", "jevis", "jevis", "jevistest", "Wiotech", "wiotech");
-     *       wsc.createStructure(3959l);
-     *   }
+     * @param host Wiotech local host ip 
+     * @param port Wiotech db port
+     * @param schema Db schema
+     * @param dbUser User
+     * @param dbPW Password
      * 
      */
     public WiotechStructureCreator(String host, Integer port, String schema, String dbUser, String dbPW)throws ClassNotFoundException, SQLException {
@@ -96,53 +100,32 @@ public class WiotechStructureCreator {
         this._dbUser = dbUser;
         this._dbPW = dbPW;
        
-            String url = loadJDBC(_host, _port, _schema, _dbUser, _dbPW);
-        url = url;
+        String url = loadJDBC(_host, _port, _schema, _dbUser, _dbPW);
         getSensorDetails();
     }
-    
-     /**
-     * Example how to use WiotechStructureCreator
-     *
-     * @param args not used
-     */
-   /* public static void main(String[] args){
-        
-        Long buildingID = Long.parseLong(args[0]);
-        String localManagerIP = args [1];
-        String dbUser = args[2];
-        String dbPwd = args [3];
-        
-        
-        WiotechStructureCreator wsc = new WiotechStructureCreator(localManagerIP, 3306, "db_lm_cbv2", dbUser, dbPwd);
-        //wsc.backupSensorData("db_lm_cbv2", dbUser, dbPwd);
-        wsc.connectToJEVis("localhost", "3306", "jevis", "jevis", "jevistest", "Sys Admin", "jevis");
-        //wsc.createStructure(buildingID);
-        Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.INFO, "Structure created sucessfully");
-    }*/
-    
+
     /**
      * 
      * Creates the needed JEVis structure
      * 
      * @param buildingId building node id, where the structure has to be created
      * 
-     * TODO Enable mysql server
-     * TODO Add units
      */
     public void createStructure(ObjectTree tree, JEVisObject buildingObject){
-        
+        // used only for JEConfig tree updates
         this.tree = tree;
+        
+        //load the JEConfig instance from the selected building node
         try {
             jevis = buildingObject.getDataSource();
         } catch (JEVisException ex) {
             Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
         }
-        ObjectAndBoolean dsd =createObjectCheckNameExistance(buildingObject.getID(), "Data Source Directory", "Data Source Directory");
-           
-        
-        ObjectAndBoolean mysqlServer = createObjectCheckNameExistance(dsd.getJEVisObject().getID(), "MySQL Server", "MySQL Server");
-            
+        // Start to createthe needed structure
+        ObjectAndBoolean dsd =createObjectCheckNameExistance(buildingObject.getID(), 
+                "Data Source Directory", "Data Source Directory");
+        ObjectAndBoolean mysqlServer = createObjectCheckNameExistance(dsd.getJEVisObject().getID(), 
+                "MySQL Server", "MySQL Server");
             if(mysqlServer.isNew){
                 long id = mysqlServer.getJEVisObject().getID();
                 writeToJEVis(id, "Schema", _schema);
@@ -154,7 +137,8 @@ public class WiotechStructureCreator {
             }
             
         ObjectAndBoolean dataDirectory = createObjectCheckNameExistance(buildingObject.getID(), "Data Directory", "Data Directory");
-            
+        
+        // Create the JEVis Structure for every sensor
         for(Sensor sensor : _result){
             ObjectAndBoolean sqlChannelDir = createObjectCheckNameExistance(mysqlServer.getJEVisObject().getID(),
                     "SQL Channel Directory", sensor.getName()+"_"+sensor.getSymbol());
@@ -171,12 +155,12 @@ public class WiotechStructureCreator {
             ObjectAndBoolean sqlDPD = createObjectCheckNameExistance(channel.getJEVisObject().getID(), "SQL Data Point Directory", "DPD");
             ObjectAndBoolean sqlDP = createObjectCheckNameExistance(sqlDPD.getJEVisObject().getID(), "SQL Data Point", "DP");
             ObjectAndBoolean device = createObjectCheckNameExistance(dataDirectory.getJEVisObject().getID(), "Device", sensor.getName());
-            if(device.isNew){
-                long id =device.getJEVisObject().getID();
-                writeToJEVis(id, "MAC",sensor.getName());
-            }
+                if(device.isNew){
+                    long id =device.getJEVisObject().getID();
+                    writeToJEVis(id, "MAC",sensor.getName());
+                }
+                
             ObjectAndBoolean data = createObjectCheckNameExistance(device.getJEVisObject().getID(), "Data", sensor.getSymbol());
-            
             try {
                 JEVisAttribute  attributeValue = data.getJEVisObject().getAttribute("Value");
                 attributeValue.setDisplayUnit(new JEVisUnitImp(Unit.valueOf(sensor.getUnit()), "", JEVisUnit.Prefix.NONE));
@@ -191,11 +175,7 @@ public class WiotechStructureCreator {
             }
         }
         
-        
-        
-        
-        
-         
+        // Update the JEVis tree in a new ??Thread??
         try {
             final TreeItem<JEVisObject> newTreeItem = tree.buildItem(buildingObject);
             TreeItem<JEVisObject> parentItem;
@@ -218,10 +198,8 @@ public class WiotechStructureCreator {
      * Reads the sensor details from the wiotech local manager db and stores it in a List of sensor types
      * 
      */
-    private void getSensorDetails(){
-        try {
-            
-           
+    private void getSensorDetails() throws SQLException{
+
             String sql_query = "select macs.MACAddr, macs.NwkAddr, tabs.TABLE_NAME " +
                             "from db_lm_cbv2._cbv2_macnwkaddr as macs " +
                             "LEFT JOIN information_schema.tables AS tabs " +
@@ -233,37 +211,9 @@ public class WiotechStructureCreator {
             while (rs.next()) {
                 if(rs.getString(3)!=null){
                     String sensorDetails = rs.getString(3);
-                    
-                    boolean add = _result.add(new Sensor(sensorDetails));
+                    _result.add(new Sensor(sensorDetails));
                 }
             }
-            
-        } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(WiotechStructureCreator.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        
-        }
-        
-    }
-    
-    
-    private void backupSensorData(String dbName, String dbUser, String dbPassword) {
- 
-        try {
-            String executeCmd = "";
-            executeCmd = "mysqldump -u "+dbUser + " -p"+dbPassword + " "+dbName + " -r ";
-            
-            Process runtimeProcess =Runtime.getRuntime().exec(executeCmd);
-            int processComplete = runtimeProcess.waitFor();
-            if(processComplete == 0){
-                System.out.println("Backup taken successfully");
-            } else {
-                System.out.println("Could not take mysql backup");
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
     /**
@@ -322,22 +272,31 @@ public class WiotechStructureCreator {
                             Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, "Cannot create Object because the parent JEVisClass does not allow the child");
                         }
                     }
-
                 } else {
                     Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, "Cannot create Object because the parent is not accessible");
                 }
-
             } else {
                 Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, "Connection to the JEVisServer is not alive");
             }
-
         } catch (JEVisException ex) {
             Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
         }
         return newObject;
     }
     
-    
+    /**
+     *
+     * Before it crates a new JEVis object, it checks
+     * -- for Device Nodes: compares the attribute 'MAC'
+     * -- for any other node the name
+     * and if the same node does not exist, it creates a new one
+     * 
+     * @param parentObjectID unique ID of the parent object where the new object
+     * will be created under
+     * @param newObjectClass The JEVisClass of the new JEVisObject
+     * @param newObjectName The name of the new JEVisObject
+     * @return 
+     */
     private static ObjectAndBoolean createObjectCheckNameExistance(long parentObjectID, String newObjectClass, String newObjectName) {
         
         try {
@@ -347,50 +306,44 @@ public class WiotechStructureCreator {
 
                 //Get the ParentObject from the JEVis system
                 if (jevis.getObject(parentObjectID) != null) {
-
                     JEVisObject parentObject = jevis.getObject(parentObjectID);
-
                     List<JEVisObject> children = parentObject.getChildren();
                     
                     for(JEVisObject child : children){
                         
-
-                        try{
+                        try{// Do not remove try/catch, important for updating an existing JEVis structure
                             String mac = child.getAttribute("MAC").getLatestSample().getValueAsString();
                             if(mac.equals(newObjectName)){
+                                // Same object exists, load it, only for 'Device' nodes
+                                // with 'MAC' as attribute
                                 return new ObjectAndBoolean(child, false);
                             } 
                         }catch(NullPointerException ex){
                             if(child.getName().equals(newObjectName)){
-                                //child.commit();
+                                // Same object exists, load it, load it
                                 return new ObjectAndBoolean(child, false);
                             } 
                         }
                     }
-
                 } else {
                     Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, "Cannot create Object because the parent is not accessible");
                 }
-
             } else {
                 Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, "Connection to the JEVisServer is not alive");
             }
-
         } catch (JEVisException ex) {
             Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
         }
+        // create a new object
         ObjectAndBoolean returnObject = new ObjectAndBoolean(createObject(parentObjectID, newObjectClass, newObjectName), true);
-        /*try {
-            returnObject.getJEVisObject().commit();
-        } catch (JEVisException ex) {
-            Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        
         return returnObject;
     }
     
     /**
      * 
-     * Connect to JEVis
+     * Connect to JEVis, only if the program is not integrated in JEConfig
+     * uncomment it for terminal usage
      *
      * @param sqlServer Address of the MySQL Server
      * @param port Port of the MySQL Server, Default is 3306
@@ -400,14 +353,11 @@ public class WiotechStructureCreator {
      * @param jevisUser Username of the JEVis user
      * @param jevisPW Password of the JEVis user
      */
-    public void connectToJEVis(String sqlServer, String port, String sqlSchema, String sqlUser, String sqlPW, String jevisUser, String jevisPW) {
+    /*public void connectToJEVis(String sqlServer, String port, String sqlSchema, String sqlUser, String sqlPW, String jevisUser, String jevisPW) {
 
         try {
             //Create an new JEVisDataSource from the MySQL implementation 
-            //JEAPI-SQl. This connection needs an vaild user on the MySQl Server.
-            //Later it will also be possible to use the JEAPI-WS and by this 
-            //using the JEVis webservice (REST) as an endpoint which is much
-            //saver than using a public SQL-port.
+            //JEAPI-SQl. This connection needs an vaild user on the MySQl Server
             jevis = new JEVisDataSourceSQL(sqlServer, port, sqlSchema, sqlUser, sqlPW);
 
             //authentificate the JEVis user.
@@ -423,12 +373,11 @@ public class WiotechStructureCreator {
             Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
-
-    }
+    }*/
     
      /**
      *
-     * set a node attribute 
+     * Set a node attribute 
      *
      * @param objectID unique ID of the JEVisObject on the Server.
      * @param attributeName unique name of the Attribute under this Object
@@ -458,8 +407,6 @@ public class WiotechStructureCreator {
                         JEVisSample newSample = attribute.buildSample(timestamp, value, "This is an note, imported via SysReader");
                         //Until now we created the sample only localy and we have to commit it to the JEVis Server.
                         newSample.commit();
-
-                        //TODO: we need an example for attribute.addSamples(listOfSamples); function. This function allows to commit a bunch of sample at once
                     } else {
                         Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, "Could not found the Attribute with the name:" + attributeName);
                     }
@@ -468,14 +415,15 @@ public class WiotechStructureCreator {
                 }
             } else {
                 Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, "Connection to the JEVisServer is not alive");
-                //TODO: the programm could now retry to connect,
-                //We dont have to do the isConnectionAlive() but use the JEVisException to handle this problem.
             }
         } catch (JEVisException ex) {
             Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
+    /**
+     * A wrapper class for JEVis objects, to check if they exist already
+     */
     private static class ObjectAndBoolean{
         
         private boolean isNew;
@@ -486,22 +434,12 @@ public class WiotechStructureCreator {
             this.isNew = isNew;
         }
         
-        
-       /* public void setBoolean(boolean isNew){
-            this.isNew = isNew;
-        }
-        
-        public void setJEVisObject(JEVisObject jeObject){
-            this.jeObject = jeObject;
-        }*/
-        
         public boolean getBoolean(){
             return this.isNew;
         }
-        
+
         public JEVisObject getJEVisObject(){
             return this.jeObject;
         }
-        
     }
 }
