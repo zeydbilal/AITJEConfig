@@ -23,6 +23,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -86,12 +87,14 @@ public class AutomatedWizardStep3 extends WizardPane {
         csvFileNameTextField = new TextField();
         csvFileNameTextField.setPrefWidth(200);
         csvFileNameTextField.setPromptText("File Name");
-
+        ProgressBar pb = new ProgressBar();
         //File Name
         HBox hBoxTop = new HBox();
         hBoxTop.setSpacing(10);
-        hBoxTop.getChildren().addAll(serverName, csvFileNameTextField);
+        hBoxTop.getChildren().addAll(serverName, csvFileNameTextField, pb);
         hBoxTop.setPadding(new Insets(10, 10, 10, 10));
+        
+        
 
         ObservableList<JEVisClass> childrenList = FXCollections.observableArrayList();
         try {

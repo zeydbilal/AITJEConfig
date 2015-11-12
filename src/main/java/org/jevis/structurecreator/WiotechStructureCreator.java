@@ -366,7 +366,7 @@ public class WiotechStructureCreator {
                             } 
                         }catch(NullPointerException ex){
                             if(child.getName().equals(newObjectName)){
-                                child.commit();
+                                //child.commit();
                                 return new ObjectAndBoolean(child, false);
                             } 
                         }
@@ -384,11 +384,11 @@ public class WiotechStructureCreator {
             Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
         }
         ObjectAndBoolean returnObject = new ObjectAndBoolean(createObject(parentObjectID, newObjectClass, newObjectName), true);
-        try {
+        /*try {
             returnObject.getJEVisObject().commit();
         } catch (JEVisException ex) {
             Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
         return returnObject;
     }
     

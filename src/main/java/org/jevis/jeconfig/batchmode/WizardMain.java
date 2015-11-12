@@ -67,7 +67,7 @@ public class WizardMain extends Wizard {
 
             @Override
             public boolean canAdvance(WizardPane currentPage) {
-                return currentPage != manualStep4 && currentPage != automatedWizardStep3;
+                return currentPage != manualStep4 && currentPage != automatedWizardStep2;
             }
 
             private WizardPane getNext(WizardPane currentPage) {

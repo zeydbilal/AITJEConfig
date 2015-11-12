@@ -15,11 +15,16 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -27,6 +32,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -35,6 +41,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
+import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.jevis.api.JEVisAttribute;
@@ -48,7 +55,7 @@ import org.joda.time.DateTime;
 
 /**
  *
- * @author Zeyd Bilal Calis
+ * @author Werner Lamprecht
  */
 //In dieser Klasse wird ein Server Objekt erzeugt und seine Attribute werden in die datenbank abgespeichert.
 public class AutomatedWizardStep2 extends WizardPane {
@@ -64,7 +71,7 @@ public class AutomatedWizardStep2 extends WizardPane {
     //Hier wird die Verbindungsdaten(Datanbankname,Host,Port) für den HTTP-Server initialisiert.
     private SensorMap sensorMap;
     
-    
+    private Button button;
     private TextField localManagerIPTxtf;
     private TextField databaseUserTxtf;
     private TextField databasePwdTxtf;
@@ -97,13 +104,14 @@ public class AutomatedWizardStep2 extends WizardPane {
     }
        
     public void commitServerObject() {
-        WiotechStructureCreator wsc = new WiotechStructureCreator(localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", databaseUserTxtf.getText(), databasePwdTxtf.getText());
-        wsc.createStructure(tree, wizardSelectedObject.getCurrentSelectedBuildingObject());
-        try {
-            wizardSelectedObject.setCurrentSelectedBuildingObject(wizardSelectedObject.getCurrentSelectedBuildingObject().getChildren().get(0));
-        } catch (JEVisException ex) {
-            Logger.getLogger(AutomatedWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
-        }
+       
+        
+       
+       
+        
+        
+        
+        
         
     }
 
@@ -147,8 +155,9 @@ public class AutomatedWizardStep2 extends WizardPane {
 
     // GUI Elemente
     private BorderPane getInit() {
+        
         BorderPane root = new BorderPane();
-
+        GridPane gridpane = new GridPane();
        // ObservableList<JEVisClass> options = FXCollections.observableArrayList();
         
         /*try {
@@ -252,28 +261,82 @@ public class AutomatedWizardStep2 extends WizardPane {
             Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
         }*/
 
+        ProgressBar pb = new ProgressBar();
         
-        HBox localManagerIPhBox = new HBox();
-        localManagerIPhBox.setSpacing(30);
-        localManagerIPhBox.getChildren().addAll(localManagerIPLbl, localManagerIPTxtf);
-        localManagerIPhBox.setPadding(new Insets(10, 10, 10, 0));
-
-        HBox dbUserhBox = new HBox();
-        dbUserhBox.setSpacing(10);
-        dbUserhBox.getChildren().addAll(databaseUserLbl, databaseUserTxtf);
-        dbUserhBox.setPadding(new Insets(10, 10, 10, 0));
+        button = new Button("Start Structure Creation");
         
-        HBox dbPwdhBox = new HBox();
-        dbPwdhBox.setSpacing(10);
-        dbPwdhBox.getChildren().addAll(databasePwdLbl, databasePwdTxtf);
-        dbPwdhBox.setPadding(new Insets(10, 10, 10, 0));
+        
+        //HBox localManagerIPhBox = new HBox();
+        //localManagerIPhBox.setSpacing(30);
+        //localManagerIPhBox.getChildren().addAll(localManagerIPLbl, localManagerIPTxtf);
+        gridpane.addRow(0, localManagerIPLbl, localManagerIPTxtf);
+        //localManagerIPhBox.setPadding(new Insets(10, 10, 10, 0));
 
-        VBox vBoxTop = new VBox();
-        vBoxTop.getChildren().addAll(localManagerIPhBox, dbUserhBox, dbPwdhBox);
-        vBoxTop.setPadding(new Insets(10, 10, 10, 10));
-        root.setTop(vBoxTop);
-        root.setCenter(getTypes());
-       
+        //HBox dbUserhBox = new HBox();
+        //dbUserhBox.setSpacing(10);
+        //dbUserhBox.getChildren().addAll(databaseUserLbl, databaseUserTxtf);
+        //dbUserhBox.setPadding(new Insets(10, 10, 10, 0));
+        gridpane.addRow(1, databaseUserLbl, databaseUserTxtf);
+        
+        //HBox dbPwdhBox = new HBox();
+        //dbPwdhBox.setSpacing(10);
+        //dbPwdhBox.getChildren().addAll(databasePwdLbl, databasePwdTxtf);
+        //dbPwdhBox.setPadding(new Insets(10, 10, 10, 0));
+        gridpane.addRow(2, databasePwdLbl, databasePwdTxtf);
+        //VBox vBoxTop = new VBox();
+        //vBoxTop.getChildren().addAll(localManagerIPhBox, dbUserhBox, dbPwdhBox, button);
+        //vBoxTop.setPadding(new Insets(10, 10, 10, 10));
+        
+        gridpane.addRow(3, button);
+        gridpane.setHgap(10);//horizontal gap in pixels 
+        gridpane.setVgap(10);//vertical gap in pixels
+        gridpane.setPadding(new Insets(10, 10, 10, 10));////margins around the whole grid
+        
+         Label doneLbl = new Label("Structure Created");
+         doneLbl.setVisible(false);
+         VBox labelVBox = new VBox(doneLbl);
+        gridpane.addRow(4, labelVBox);
+        
+        //GridPane.setHalignment(doneLbl, HPos.CENTER);
+        //GridPane.setValignment(doneLbl, VPos.CENTER);
+        root.setTop(gridpane);
+        //root.setCenter(getTypes());
+        
+        button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                //vBoxTop.getChildren().add(pb);
+                //pb.prefWidthProperty().bind(gridpane.widthProperty().subtract(10));
+                gridpane.add(pb, 1, 3);
+                button.setDisable(true);
+                
+                 Runnable r = new Runnable() {
+            public void run() {
+                
+               WiotechStructureCreator wsc = new WiotechStructureCreator(localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", databaseUserTxtf.getText(), databasePwdTxtf.getText());
+               wsc.createStructure(tree, wizardSelectedObject.getCurrentSelectedBuildingObject());
+               try {
+                   wizardSelectedObject.setCurrentSelectedBuildingObject(wizardSelectedObject.getCurrentSelectedBuildingObject().getChildren().get(0));
+               } catch (JEVisException ex) {
+                   Logger.getLogger(AutomatedWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
+               }
+               pb.setVisible(false);
+               doneLbl.setVisible(true);
+               
+               
+              
+               
+            }
+
+                    
+            
+        };
+        
+        Thread runner = new Thread(r);
+        runner.start();
+                 
+                
+            }
+        });
         return root;
 
     }
