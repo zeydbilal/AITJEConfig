@@ -19,6 +19,8 @@ package org.jevis.structurecreator;
 
 /**
  * This class is used for collecting Wiotech sensor details
+ * 
+ * TODO change unicode string for CO2 in convertAndSetUnit()
  */
 public class Sensor {
 

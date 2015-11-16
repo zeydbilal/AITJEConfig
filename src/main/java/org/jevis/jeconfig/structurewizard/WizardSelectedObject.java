@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.jevis.jeconfig.batchmode;
+package org.jevis.jeconfig.structurewizard;
 
 import org.jevis.api.JEVisObject;
 

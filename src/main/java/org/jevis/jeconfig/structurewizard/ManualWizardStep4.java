@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.jevis.jeconfig.batchmode;
+package org.jevis.jeconfig.structurewizard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +35,8 @@ import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.api.JEVisUnit;
 import org.jevis.commons.unit.JEVisUnitImp;
+import org.jevis.jeconfig.bulgedit.SpreadsheetViewTable;
+import org.jevis.jeconfig.structurewizard.WizardSelectedObject;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
 import org.joda.time.DateTime;
 

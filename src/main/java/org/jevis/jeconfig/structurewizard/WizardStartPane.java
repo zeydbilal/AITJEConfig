@@ -1,4 +1,4 @@
-package org.jevis.jeconfig.batchmode;
+package org.jevis.jeconfig.structurewizard;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -45,7 +45,7 @@ public class WizardStartPane extends WizardPane {
         manual.setToggleGroup(group);
         manual.setSelected(true);
 
-        automated = new RadioButton("Automated");
+        automated = new RadioButton("Automated Wiotech Structure Creation");
         automated.setToggleGroup(group);
 
         group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {

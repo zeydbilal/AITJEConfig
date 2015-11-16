@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.jevis.jeconfig.batchmode;
+package org.jevis.jeconfig.structurewizard;
 
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +23,6 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -34,6 +33,8 @@ import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisClass;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
+import org.jevis.jeconfig.bulgedit.CreateTable;
+import org.jevis.jeconfig.structurewizard.WizardSelectedObject;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
 import org.joda.time.DateTime;
 
@@ -41,8 +42,7 @@ import org.joda.time.DateTime;
  *
  * @author Zeyd Bilal Calis
  */
-//In dieser Klasse wird ein JSON-Parser und Data Point Directory erzeugt.
-public class AutomatedWizardStep3 extends WizardPane {
+public class ManualWizardStep3 extends WizardPane {
 
     private WizardSelectedObject wizardSelectedObject;
     private TextField csvFileNameTextField;
@@ -52,7 +52,7 @@ public class AutomatedWizardStep3 extends WizardPane {
     private ObservableList<String> listBuildSample = FXCollections.observableArrayList();
     private Map<String, String> map = new TreeMap<String, String>();
 
-    public AutomatedWizardStep3(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
+    public ManualWizardStep3(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
         this.wizardSelectedObject = wizardSelectedObject;
         this.tree = tree;
         setMinSize(500, 500);
@@ -62,7 +62,7 @@ public class AutomatedWizardStep3 extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
-        //setContent(getInit());
+        setContent(getInit());
         ObservableList<ButtonType> list = getButtonTypes();
 
         for (ButtonType type : list) {
@@ -76,7 +76,7 @@ public class AutomatedWizardStep3 extends WizardPane {
 
     @Override
     public void onExitingPage(Wizard wizard) {
-        //Erzeuge die JSON-Parser und Data Point Directory
+        //Erzeuge die CSV-Parser und Data Point Directory
         commitObjects();
     }
 
@@ -87,20 +87,18 @@ public class AutomatedWizardStep3 extends WizardPane {
         csvFileNameTextField = new TextField();
         csvFileNameTextField.setPrefWidth(200);
         csvFileNameTextField.setPromptText("File Name");
-        ProgressBar pb = new ProgressBar();
+
         //File Name
         HBox hBoxTop = new HBox();
         hBoxTop.setSpacing(10);
-        hBoxTop.getChildren().addAll(serverName, csvFileNameTextField, pb);
+        hBoxTop.getChildren().addAll(serverName, csvFileNameTextField);
         hBoxTop.setPadding(new Insets(10, 10, 10, 10));
-        
-        
 
         ObservableList<JEVisClass> childrenList = FXCollections.observableArrayList();
         try {
             childrenList = FXCollections.observableArrayList(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses());
             for (JEVisClass child : childrenList) {
-                if (child.getName().equals("JSON Parser")) {
+                if (child.getName().equals("CSV Parser")) {
                     // createClass wurde initialisiert
                     createClass = child;
                 }
@@ -123,8 +121,8 @@ public class AutomatedWizardStep3 extends WizardPane {
 
         return root;
     }
-
-    //Create JSON Parser and Data Point Directory
+    
+    //Create CSV Parser and Data Point Directory
     public void commitObjects() {
         ObservableList<JEVisClass> childrenList = FXCollections.observableArrayList();
 
@@ -132,27 +130,23 @@ public class AutomatedWizardStep3 extends WizardPane {
             childrenList = FXCollections.observableArrayList(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses());
 
             for (JEVisClass child : childrenList) {
-                if (child.getName().equals("JSON Parser")) {
-                    //Create JSON Parser
+                if (child.getName().equals("CSV Parser")) {
                     JEVisObject newObject = wizardSelectedObject.getCurrentSelectedObject().buildObject(csvFileNameTextField.getText(), child);
                     newObject.commit();
-                    //Commit attributes for JSON Parser
+                    //Commit attributes for CSV Parser
                     commitAttributes(newObject);
 
                 } else if (child.getName().equals("Data Point Directory")) {
-                    //Create Data Point Directory
                     JEVisObject newObject = wizardSelectedObject.getCurrentSelectedObject().buildObject(child.getName(), child);
                     newObject.commit();
-                    //Selected object is the new DataPointDirectory
-                    //Set the Data Point Directory for the last Step.
                     wizardSelectedObject.setCurrentDataPointDirectory(newObject);
                 }
             }
         } catch (JEVisException ex) {
-            Logger.getLogger(AutomatedWizardStep3.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManualWizardStep3.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     //Commit the attributes and create the samples
     public void commitAttributes(JEVisObject newObject) {
         try {

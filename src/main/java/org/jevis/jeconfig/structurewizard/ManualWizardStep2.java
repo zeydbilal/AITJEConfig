@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.jevis.jeconfig.batchmode;
+package org.jevis.jeconfig.structurewizard;
 
 import java.util.Comparator;
 import java.util.List;
@@ -18,44 +18,55 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisClass;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
+import org.jevis.jeconfig.bulgedit.CreateTable;
+import org.jevis.jeconfig.structurewizard.WizardSelectedObject;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
+import org.jevis.jeconfig.tool.ImageConverter;
 import org.joda.time.DateTime;
 
 /**
  *
  * @author Zeyd Bilal Calis
  */
-public class ManualWizardStep3 extends WizardPane {
+//In dieser Klasse wird ein Server Objekt erzeugt und seine Attribute werden in die datenbank abgespeichert.
+public class ManualWizardStep2 extends WizardPane {
 
-    private WizardSelectedObject wizardSelectedObject;
-    private TextField csvFileNameTextField;
     private JEVisClass createClass;
+    private TextField serverNameTextField;
     private ObjectTree tree;
     private ObservableList<String> typeNames = FXCollections.observableArrayList();
     private ObservableList<String> listBuildSample = FXCollections.observableArrayList();
+    private WizardSelectedObject wizardSelectedObject;
     private Map<String, String> map = new TreeMap<String, String>();
 
-    public ManualWizardStep3(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
+    public ManualWizardStep2(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
         this.wizardSelectedObject = wizardSelectedObject;
         this.tree = tree;
         setMinSize(500, 500);
-
         setGraphic(null);
+
     }
 
     @Override
@@ -67,85 +78,32 @@ public class ManualWizardStep3 extends WizardPane {
             if (type.getButtonData().equals(ButtonBar.ButtonData.BACK_PREVIOUS)) {
                 Node prev = lookupButton(type);
                 prev.visibleProperty().setValue(Boolean.FALSE);
-
             }
         }
     }
 
     @Override
     public void onExitingPage(Wizard wizard) {
-        //Erzeuge die CSV-Parser und Data Point Directory
-        commitObjects();
+        //Erzeuge das Server-Objekt
+        commitServerObject();
     }
 
-    private BorderPane getInit() {
-        BorderPane root = new BorderPane();
-
-        Label serverName = new Label("File Name : ");
-        csvFileNameTextField = new TextField();
-        csvFileNameTextField.setPrefWidth(200);
-        csvFileNameTextField.setPromptText("File Name");
-
-        //File Name
-        HBox hBoxTop = new HBox();
-        hBoxTop.setSpacing(10);
-        hBoxTop.getChildren().addAll(serverName, csvFileNameTextField);
-        hBoxTop.setPadding(new Insets(10, 10, 10, 10));
-
-        ObservableList<JEVisClass> childrenList = FXCollections.observableArrayList();
+    public void commitServerObject() {
         try {
-            childrenList = FXCollections.observableArrayList(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses());
-            for (JEVisClass child : childrenList) {
-                if (child.getName().equals("CSV Parser")) {
-                    // createClass wurde initialisiert
-                    createClass = child;
-                }
-            }
+            //Create Server.
+            JEVisObject newObject = wizardSelectedObject.getCurrentSelectedObject().buildObject(serverNameTextField.getText(), createClass);
+            newObject.commit();
+            //Commit the Attributes
+            commitAttributes(newObject);
+
+            //wähle den Server als neue Objekt aus!
+            wizardSelectedObject.setCurrentSelectedObject(newObject);
+
         } catch (JEVisException ex) {
             Logger.getLogger(ManualWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        //Get and set the typenames from a class. Typenames are for the columnnames.
-        try {
-            for (int i = 0; i < createClass.getTypes().size(); i++) {
-                typeNames.add(createClass.getTypes().get(i).getName());
-            }
-        } catch (JEVisException ex) {
-            Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        root.setTop(hBoxTop);
-        root.setCenter(getTypes());
-
-        return root;
     }
-    
-    //Create CSV Parser and Data Point Directory
-    public void commitObjects() {
-        ObservableList<JEVisClass> childrenList = FXCollections.observableArrayList();
 
-        try {
-            childrenList = FXCollections.observableArrayList(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses());
-
-            for (JEVisClass child : childrenList) {
-                if (child.getName().equals("CSV Parser")) {
-                    JEVisObject newObject = wizardSelectedObject.getCurrentSelectedObject().buildObject(csvFileNameTextField.getText(), child);
-                    newObject.commit();
-                    //Commit attributes for CSV Parser
-                    commitAttributes(newObject);
-
-                } else if (child.getName().equals("Data Point Directory")) {
-                    JEVisObject newObject = wizardSelectedObject.getCurrentSelectedObject().buildObject(child.getName(), child);
-                    newObject.commit();
-                    wizardSelectedObject.setCurrentDataPointDirectory(newObject);
-                }
-            }
-        } catch (JEVisException ex) {
-            Logger.getLogger(ManualWizardStep3.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    //Commit the attributes and create the samples
     public void commitAttributes(JEVisObject newObject) {
         try {
             List<JEVisAttribute> attribut = newObject.getAttributes();
@@ -177,7 +135,105 @@ public class ManualWizardStep3 extends WizardPane {
         FXCollections.sort(list, sort);
     }
 
-    //Erzeuge Label,TextField und CheckBox variablen von schon definierten Typen.
+    // GUI Elemente
+    private BorderPane getInit() {
+        BorderPane root = new BorderPane();
+
+        ObservableList<JEVisClass> options = FXCollections.observableArrayList();
+
+        try {
+            options = FXCollections.observableArrayList(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses());
+        } catch (JEVisException ex) {
+            Logger.getLogger(ManualWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        // Set the cell properties for ComboBox
+        Callback<ListView<JEVisClass>, ListCell<JEVisClass>> cellFactory = new Callback<ListView<JEVisClass>, ListCell<JEVisClass>>() {
+            @Override
+            public ListCell<JEVisClass> call(ListView<JEVisClass> param) {
+                final ListCell<JEVisClass> cell = new ListCell<JEVisClass>() {
+                    {
+                        super.setPrefWidth(260);
+                    }
+
+                    @Override
+                    public void updateItem(JEVisClass item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null && !empty) {
+                            HBox box = new HBox(5);
+                            box.setAlignment(Pos.CENTER_LEFT);
+                            try {
+                                ImageView icon = ImageConverter.convertToImageView(item.getIcon(), 15, 15);
+                                Label cName = new Label(item.getName());
+                                cName.setTextFill(Color.BLACK);
+                                box.getChildren().setAll(icon, cName);
+
+                            } catch (JEVisException ex) {
+                                Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            setGraphic(box);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        Label serverName = new Label();
+        serverNameTextField = new TextField();
+        serverNameTextField.setPrefWidth(200);
+        serverNameTextField.setPromptText("Server Name");
+
+        // Add the servers in to the ComboBox ComboBox
+        ComboBox<JEVisClass> classComboBox = new ComboBox<JEVisClass>(options);
+        classComboBox.setCellFactory(cellFactory);
+        classComboBox.setButtonCell(cellFactory.call(null));
+        classComboBox.setMinWidth(250);
+        classComboBox.getSelectionModel().selectFirst();
+        createClass = classComboBox.getSelectionModel().getSelectedItem();
+
+        classComboBox.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                typeNames.clear();
+                map.clear();
+                listBuildSample.clear();
+                createClass = classComboBox.getSelectionModel().getSelectedItem();
+                try {
+                    for (int i = 0; i < createClass.getTypes().size(); i++) {
+                        typeNames.add(createClass.getTypes().get(i).getName());
+                    }
+                } catch (JEVisException ex) {
+                    Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                root.setCenter(getTypes());
+            }
+        });
+
+        //Get and set the typenames from a class. Typenames are for the columnnames.
+        try {
+            for (int i = 0; i < createClass.getTypes().size(); i++) {
+                typeNames.add(createClass.getTypes().get(i).getName());
+            }
+        } catch (JEVisException ex) {
+            Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        serverName.setText("Name : ");
+
+        //Servername and ComboBox
+        HBox hBoxTop = new HBox();
+        hBoxTop.setSpacing(10);
+        hBoxTop.getChildren().addAll(serverName, serverNameTextField, classComboBox);
+        hBoxTop.setPadding(new Insets(10, 10, 10, 10));
+
+        root.setTop(hBoxTop);
+        root.setCenter(getTypes());
+
+        return root;
+    }
+
+    //Erzeuge Label,TextField und CheckBox variablen von schon vordefinierten Typen.
     public GridPane getTypes() {
         GridPane gridpane = new GridPane();
 
@@ -210,6 +266,8 @@ public class ManualWizardStep3 extends WizardPane {
                     } else {
                         map.put(checkBox.getId(), "0");
                     }
+
+                    map.put(checkBox.getId(), checkBox.getText());
 
                     checkBox.setOnAction(new EventHandler<ActionEvent>() {
                         @Override

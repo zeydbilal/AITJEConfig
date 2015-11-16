@@ -1,10 +1,29 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright (C) 2015 WernerLamprecht <werner.lamprecht@ymail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation in version 3.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * This wizard is part of the OpenJEVis project, further project information are
+ * published at <http://www.OpenJEVis.org/>.
  */
-package org.jevis.jeconfig.batchmode;
+package org.jevis.jeconfig.structurewizard;
 
+import org.jevis.jeconfig.structurewizard.ManualWizardStep3;
+import org.jevis.jeconfig.structurewizard.ManualWizardStep2;
+import org.jevis.jeconfig.structurewizard.AutomatedWizardStep1;
+import org.jevis.jeconfig.structurewizard.ManualWizardStep4;
+import org.jevis.jeconfig.structurewizard.ManualWizardStep1;
+import org.jevis.jeconfig.structurewizard.AutomatedWizardStep2;
+import org.jevis.jeconfig.structurewizard.WizardStartPane;
 import java.util.Optional;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
@@ -13,7 +32,7 @@ import org.jevis.jeconfig.plugin.object.ObjectTree;
 
 /**
  *
- * @author Zeyd Bilal Calis
+ * @author Werner Lamprecht, Zeyd Bilal Calis
  */
 public class WizardMain extends Wizard {
 
@@ -22,8 +41,6 @@ public class WizardMain extends Wizard {
     private WizardStartPane wizardStartPane;
     //The selected Parents.
     private WizardSelectedObject wizardSelectedObject = new WizardSelectedObject();
-    //Create SensorMap object for Step2 and Step4
-    private SensorMap sensorMap = new SensorMap();
 
     //Manual Steps
     private ManualWizardStep1 manualStep1;
@@ -34,8 +51,6 @@ public class WizardMain extends Wizard {
     //Automated Steps
     private AutomatedWizardStep1 automatedWizardStep1;
     private AutomatedWizardStep2 automatedWizardStep2;
-    private AutomatedWizardStep3 automatedWizardStep3;
-    private AutomatedWizardStep4 automatedWizardStep4;
 
     public WizardMain(JEVisObject parentObject, ObjectTree tree) {
         setParentObject(parentObject);
@@ -48,9 +63,7 @@ public class WizardMain extends Wizard {
         manualStep4 = new ManualWizardStep4(tree, wizardSelectedObject);
 
         automatedWizardStep1 = new AutomatedWizardStep1(parentObject, tree, wizardSelectedObject);
-        automatedWizardStep2 = new AutomatedWizardStep2(tree, wizardSelectedObject, sensorMap);
-        automatedWizardStep3 = new AutomatedWizardStep3(tree, wizardSelectedObject);
-        automatedWizardStep4 = new AutomatedWizardStep4(tree, wizardSelectedObject, sensorMap);
+        automatedWizardStep2 = new AutomatedWizardStep2(tree, wizardSelectedObject);
 
         setTitle("JEVIS Wizard");
         initWizard();
@@ -83,14 +96,10 @@ public class WizardMain extends Wizard {
                     return manualStep3;
                 } else if (currentPage.equals(manualStep3)) {
                     return manualStep4;
-                } else if (currentPage.equals(wizardStartPane) && wizardStartPane.getControl().equals("Automated")) {
+                } else if (currentPage.equals(wizardStartPane) && wizardStartPane.getControl().equals("Automated Wiotech Structure Creation")) {
                     return automatedWizardStep1;
                 } else if (currentPage.equals(automatedWizardStep1)) {
                     return automatedWizardStep2;
-                } else if (currentPage.equals(automatedWizardStep2)) {
-                    return automatedWizardStep3;
-                } else if (currentPage.equals(automatedWizardStep3)) {
-                    return automatedWizardStep4;
                 } else {
                     return null;
                 }

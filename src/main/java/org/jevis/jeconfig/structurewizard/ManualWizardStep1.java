@@ -1,4 +1,4 @@
-package org.jevis.jeconfig.batchmode;
+package org.jevis.jeconfig.structurewizard;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -21,6 +21,7 @@ import org.jevis.api.JEVisClass;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.jeconfig.JEConfig;
+import org.jevis.jeconfig.structurewizard.WizardSelectedObject;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
 
 /**

@@ -19,8 +19,8 @@
  */
 package org.jevis.jeconfig.plugin.object;
 
-import org.jevis.jeconfig.batchmode.CreateTable;
-import org.jevis.jeconfig.batchmode.EditTable;
+import org.jevis.jeconfig.bulgedit.CreateTable;
+import org.jevis.jeconfig.bulgedit.EditTable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +70,7 @@ import org.jevis.commons.CommonClasses;
 import org.jevis.commons.CommonObjectTasks;
 import org.jevis.commons.unit.JEVisUnitImp;
 import org.jevis.jeconfig.JEConfig;
-import org.jevis.jeconfig.batchmode.WizardMain;
+import org.jevis.jeconfig.structurewizard.WizardMain;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
