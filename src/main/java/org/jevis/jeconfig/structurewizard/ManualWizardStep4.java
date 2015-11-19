@@ -35,7 +35,7 @@ import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.api.JEVisUnit;
 import org.jevis.commons.unit.JEVisUnitImp;
-import org.jevis.jeconfig.bulgedit.SpreadsheetViewTable;
+import org.jevis.jeconfig.bulkedit.SpreadsheetViewTable;
 import org.jevis.jeconfig.structurewizard.WizardSelectedObject;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
 import org.joda.time.DateTime;

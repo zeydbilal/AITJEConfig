@@ -1,4 +1,4 @@
-package org.jevis.jeconfig.bulgedit;
+package org.jevis.jeconfig.bulkedit;
 
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;

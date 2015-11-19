@@ -1,4 +1,4 @@
-package org.jevis.jeconfig.bulgedit;
+package org.jevis.jeconfig.bulkedit;
 
 import java.util.Set;
 import javafx.collections.ObservableList;

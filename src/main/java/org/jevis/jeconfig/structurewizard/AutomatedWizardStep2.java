@@ -18,11 +18,14 @@
 package org.jevis.jeconfig.structurewizard;
 
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -59,6 +62,7 @@ public class AutomatedWizardStep2 extends WizardPane {
     private TextField databaseUserTxtf;
     private TextField databasePwdTxtf;
     private Task task;
+    private Thread thread;
     
     /**
      * 
@@ -81,12 +85,22 @@ public class AutomatedWizardStep2 extends WizardPane {
     public void onEnteringPage(Wizard wizard) {
         setContent(getInit());
         
-        //Hides the 'Back' button
+        
         ObservableList<ButtonType> list = getButtonTypes();
         for (ButtonType type : list) {
+            //Hides the 'Back' button
             if (type.getButtonData().equals(ButtonBar.ButtonData.BACK_PREVIOUS)) {
                 Node prev = lookupButton(type);
                 prev.visibleProperty().setValue(Boolean.FALSE);
+            }// On 'Cancel' button pressed
+            else if (type.getButtonData().equals(ButtonBar.ButtonData.CANCEL_CLOSE)){
+                Button prev = (Button)lookupButton(type);
+                prev.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override public void handle(ActionEvent e) {
+                          thread.interrupt();
+                          
+                    }
+                });
             }
         }
     }
@@ -97,7 +111,7 @@ public class AutomatedWizardStep2 extends WizardPane {
      */
     @Override
     public void onExitingPage(Wizard wizard) {
-        task.cancel();
+        thread.interrupt();
     }
 
     /**
@@ -146,9 +160,9 @@ public class AutomatedWizardStep2 extends WizardPane {
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 
-                creationStatus.setVisible(false);
+                creationStatus.setVisible(true);
                 execStructurCreation();
-                Thread thread = new Thread (task);
+                thread = new Thread (task);
                 thread.start();
                  
             }
@@ -176,7 +190,7 @@ public class AutomatedWizardStep2 extends WizardPane {
                                 Platform.runLater(() ->errorLbl.setVisible(true));  
                                 Platform.runLater(() ->errorLbl.setText(ex.getMessage()));
                                 Platform.runLater(() ->creationStatus.setVisible(false));
-                                
+                                ex.printStackTrace();
                          }
                             
                         return null;

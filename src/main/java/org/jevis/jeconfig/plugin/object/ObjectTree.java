@@ -19,8 +19,8 @@
  */
 package org.jevis.jeconfig.plugin.object;
 
-import org.jevis.jeconfig.bulgedit.CreateTable;
-import org.jevis.jeconfig.bulgedit.EditTable;
+import org.jevis.jeconfig.bulkedit.CreateTable;
+import org.jevis.jeconfig.bulkedit.EditTable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
