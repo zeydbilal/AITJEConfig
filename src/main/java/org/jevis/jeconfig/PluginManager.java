@@ -85,6 +85,7 @@ public class PluginManager {
         _plugins.add(new org.jevis.jeconfig.plugin.classes.ClassPlugin(_ds, "Classes"));
         _plugins.add(new org.jevis.jeconfig.plugin.unit.UnitPlugin(_ds, "Units"));
         _plugins.add(new GraphPlugin(_ds, "Graph"));
+
     }
 
     public void setWatermark(boolean water) {

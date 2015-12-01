@@ -209,7 +209,7 @@ public class CopyObjectDialog {
             public void changed(ObservableValue<? extends Toggle> ov, Toggle t, Toggle t1) {
 
                 if (t1 != null) {
-                    System.out.println("new toggel: " + t1);
+//                    System.out.println("new toggel: " + t1);
                     if (t1.equals(move)) {
                         infoText = String.format("Move '%s' into '%s'", object.getName(), newParent.getName());
                         ok.setDisable(false);
@@ -233,7 +233,7 @@ public class CopyObjectDialog {
                         count.setDisable(false);
                         nameLabel.setDisable(false);
                         countLabel.setDisable(false);
-                        nameField.setText("Copy of " + object.getName());
+                        nameField.setText(object.getName());
                         checkName();
                     } else if (t1.equals(clone)) {
                         infoText = String.format("Clone '%s' into '%s' with all data", object.getName(), newParent.getName());
@@ -241,7 +241,7 @@ public class CopyObjectDialog {
                         count.setDisable(false);
                         nameLabel.setDisable(false);
                         countLabel.setDisable(false);
-                        nameField.setText("Copy of " + object.getName());
+                        nameField.setText(object.getName());
                         checkName();
                     }
 

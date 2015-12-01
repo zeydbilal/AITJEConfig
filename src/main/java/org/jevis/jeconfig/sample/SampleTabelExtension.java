@@ -40,6 +40,7 @@ import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisSample;
 import org.jevis.application.dialog.ConfirmDialog;
+import org.jevis.commons.dataprocessing.v2.DataProcessing;
 import org.jevis.jeconfig.JEConfig;
 import org.joda.time.DateTime;
 
@@ -120,7 +121,11 @@ public class SampleTabelExtension implements SampleEditorExtension {
                                         }
 
                                     }
-                                    setSamples(att, att.getSamples(startDate, endDate));
+
+                                    //TODO: add workflow selection
+                                    setSamples(att, DataProcessing.getSamples(att, startDate, endDate, ""));
+
+//                                    setSamples(att, att.getSamples(startDate, endDate));
                                     update();
                                     System.out.println("-------");
                                 }

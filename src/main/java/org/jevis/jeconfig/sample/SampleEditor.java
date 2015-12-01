@@ -59,12 +59,14 @@ import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.api.JEVisSample;
 import org.jevis.application.dialog.DialogHeader;
-import org.jevis.commons.dataprocessing.Options;
-import org.jevis.commons.dataprocessing.ProcessorObjectHandler;
-import org.jevis.commons.dataprocessing.Task;
-import org.jevis.commons.dataprocessing.TaskImp;
-import org.jevis.commons.dataprocessing.processor.AggrigatorProcessor;
-import org.jevis.commons.dataprocessing.processor.InputProcessor;
+import org.jevis.commons.dataprocessing.BasicProcessOption;
+import org.jevis.commons.dataprocessing.JsonProcessOption;
+import org.jevis.commons.dataprocessing.ProcessOptions;
+import org.jevis.commons.dataprocessing.ProcessChains;
+import org.jevis.commons.dataprocessing.Process;
+import org.jevis.commons.dataprocessing.BasicProcess;
+import org.jevis.commons.dataprocessing.function.AggrigatorFunction;
+import org.jevis.commons.dataprocessing.function.InputFunction;
 import org.jevis.jeconfig.JEConfig;
 import org.jevis.jeconfig.tool.datepicker.DatePicker;
 import org.joda.time.DateTime;
@@ -86,7 +88,7 @@ public class SampleEditor {
     private DateTime _until = null;
     private final List<SampleEditorExtension> extensions = new ArrayList<>();
     private JEVisAttribute _attribute;
-    private Task _dataProcessor;
+    private Process _dataProcessor;
     private List<JEVisObject> _dataProcessors = new ArrayList<>();
 
     private enum AGGREGATION {
@@ -350,7 +352,7 @@ public class SampleEditor {
                 proNames.add(configObject.getName());
             }
 
-        } catch (JEVisException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(SampleTabelExtension.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -375,7 +377,7 @@ public class SampleEditor {
                         //TODO going by name is not the fine art, replace!
                         for (JEVisObject configObject : _dataProcessors) {
                             if (configObject.getName().equals(newValue)) {
-                                _dataProcessor = ProcessorObjectHandler.getTask(configObject);
+                                _dataProcessor = ProcessChains.getProcessChain(configObject);
 
                                 update();
                             }
@@ -480,49 +482,56 @@ public class SampleEditor {
             _until = until;
 
             if (_dataProcessor != null) {
-                Options.setStartEnd(_dataProcessor, _from, _until, true, true);
+                ProcessOptions.setStartEnd(_dataProcessor, _from, _until, true, true);
                 _dataProcessor.restResult();
             }
 
-            Task aggrigate = null;
+            Process aggrigate = null;
             if (_mode == AGGREGATION.None) {
 
             } else if (_mode == AGGREGATION.Daily) {
-                aggrigate = new TaskImp();
+                aggrigate = new BasicProcess();
                 aggrigate.setJEVisDataSource(att.getDataSource());
                 aggrigate.setID("Dynamic");
-                aggrigate.setProcessor(new AggrigatorProcessor());
-                aggrigate.addOption(Options.PERIOD, Period.days(1).toString());
+                aggrigate.setFunction(new AggrigatorFunction());
+
+                aggrigate.getOptions().add(new BasicProcessOption(ProcessOptions.PERIOD, Period.days(1).toString()));
             } else if (_mode == AGGREGATION.Monthly) {
-                aggrigate = new TaskImp();
+                aggrigate = new BasicProcess();
                 aggrigate.setJEVisDataSource(att.getDataSource());
                 aggrigate.setID("Dynamic");
-                aggrigate.setProcessor(new AggrigatorProcessor());
-                aggrigate.addOption(Options.PERIOD, Period.months(1).toString());
+                aggrigate.setFunction(new AggrigatorFunction());
+                aggrigate.getOptions().add(new BasicProcessOption(ProcessOptions.PERIOD, Period.months(1).toString()));
+//                aggrigate.addOption(Options.PERIOD, Period.months(1).toString());
             } else if (_mode == AGGREGATION.Weekly) {
-                aggrigate = new TaskImp();
+                aggrigate = new BasicProcess();
                 aggrigate.setJEVisDataSource(att.getDataSource());
                 aggrigate.setID("Dynamic");
-                aggrigate.setProcessor(new AggrigatorProcessor());
-                aggrigate.addOption(Options.PERIOD, Period.weeks(1).toString());
+                aggrigate.setFunction(new AggrigatorFunction());
+                aggrigate.getOptions().add(new BasicProcessOption(ProcessOptions.PERIOD, Period.weeks(1).toString()));
+//                aggrigate.addOption(Options.PERIOD, Period.weeks(1).toString());
             } else if (_mode == AGGREGATION.Yearly) {
                 System.out.println("year.....  " + Period.years(1).toString());
-                aggrigate = new TaskImp();
+                aggrigate = new BasicProcess();
                 aggrigate.setJEVisDataSource(att.getDataSource());
                 aggrigate.setID("Dynamic");
-                aggrigate.setProcessor(new AggrigatorProcessor());
-                aggrigate.addOption(Options.PERIOD, Period.years(1).toString());
+                aggrigate.setFunction(new AggrigatorFunction());
+                aggrigate.getOptions().add(new BasicProcessOption(ProcessOptions.PERIOD, Period.years(1).toString()));
+//                aggrigate.addOption(Options.PERIOD, Period.years(1).toString());
             }
 
             if (_dataProcessor == null) {
                 if (aggrigate != null) {
-                    Task input = new TaskImp();
+                    Process input = new BasicProcess();
                     input.setJEVisDataSource(att.getDataSource());
                     input.setID("Dynamic Input");
-                    input.setProcessor(new InputProcessor());
-                    input.getOptions().put(InputProcessor.ATTRIBUTE_ID, _attribute.getName());
-                    input.getOptions().put(InputProcessor.OBJECT_ID, _attribute.getObject().getID() + "");
-                    aggrigate.setSubTasks(Arrays.asList(input));
+                    input.setFunction(new InputFunction());
+
+                    input.getOptions().add(new BasicProcessOption(InputFunction.ATTRIBUTE_ID, _attribute.getName()));
+                    input.getOptions().add(new BasicProcessOption(InputFunction.OBJECT_ID, _attribute.getObject().getID() + ""));
+//                    input.getOptions().put(InputFunction.ATTRIBUTE_ID, _attribute.getName());
+//                    input.getOptions().put(InputFunction.OBJECT_ID, _attribute.getObject().getID() + "");
+                    aggrigate.setSubProcesses(Arrays.asList(input));
                     samples.addAll(aggrigate.getResult());
                 } else {
                     samples.addAll(att.getSamples(from, until));
@@ -530,7 +539,7 @@ public class SampleEditor {
 
             } else {
                 if (aggrigate != null) {
-                    aggrigate.setSubTasks(Arrays.asList(_dataProcessor));
+                    aggrigate.setSubProcesses(Arrays.asList(_dataProcessor));
                     samples.addAll(aggrigate.getResult());
                 } else {
                     samples.addAll(_dataProcessor.getResult());

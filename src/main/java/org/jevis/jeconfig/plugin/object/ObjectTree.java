@@ -19,8 +19,10 @@
  */
 package org.jevis.jeconfig.plugin.object;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,11 +52,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
+import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisConstants;
 import org.jevis.api.JEVisDataSource;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.api.JEVisRelationship;
+import org.jevis.api.JEVisSample;
 import org.jevis.application.dialog.ConfirmDialog;
 import org.jevis.application.dialog.ExceptionDialog;
 import org.jevis.application.dialog.InfoDialog;
@@ -120,39 +124,39 @@ public class ObjectTree extends TreeView<JEVisObject> {
 
             treeHieght = getHeight();
 
-//            setCellFactory(new Callback<TreeView<JEVisObject>, TreeCell<JEVisObject>>() {
-//                @Override
-//                public TreeCell<JEVisObject> call(TreeView<JEVisObject> p) {
-//                    return new ObjectCell();
-//                }
-//            });
-//
             setCellFactory(new Callback<TreeView<JEVisObject>, TreeCell<JEVisObject>>() {
                 @Override
-                public TreeCell<JEVisObject> call(TreeView<JEVisObject> param) {
-                    return new TreeCell<JEVisObject>() {
-//                        private ImageView imageView = new ImageView();
-
-                        @Override
-                        protected void updateItem(JEVisObject item, boolean empty) {
-                            super.updateItem(item, empty);
-
-                            if (!empty) {
-                                ObjectGraphic gc = getObjectGraphic(item);
-
-                                setTooltip(gc.getToolTip());
-                                setContextMenu(gc.getContexMenu());
-
-//                                setText(item);
-                                setGraphic(gc.getGraphic());
-                            } else {
-                                setText(null);
-                                setGraphic(null);
-                            }
-                        }
-                    };
+                public TreeCell<JEVisObject> call(TreeView<JEVisObject> p) {
+                    return new ObjectCell();
                 }
             });
+//
+//            setCellFactory(new Callback<TreeView<JEVisObject>, TreeCell<JEVisObject>>() {
+//                @Override
+//                public TreeCell<JEVisObject> call(TreeView<JEVisObject> param) {
+//                    return new TreeCell<JEVisObject>() {
+////                        private ImageView imageView = new ImageView();
+//
+//                        @Override
+//                        protected void updateItem(JEVisObject item, boolean empty) {
+//                            super.updateItem(item, empty);
+//
+//                            if (!empty) {
+//                                ObjectGraphic gc = getObjectGraphic(item);
+//
+//                                setTooltip(gc.getToolTip());
+//                                setContextMenu(gc.getContexMenu());
+//
+////                                setText(item);
+//                                setGraphic(gc.getGraphic());
+//                            } else {
+//                                setText(null);
+//                                setGraphic(null);
+//                            }
+//                        }
+//                    };
+//                }
+//            });
 
             final KeyCombination copyID = new KeyCodeCombination(KeyCode.F1);
             final KeyCombination copyObj = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
@@ -655,6 +659,59 @@ public class ObjectTree extends TreeView<JEVisObject> {
         }
     }
 
+    public void copyObject(final JEVisObject toCopyObj, final JEVisObject newParent, String newName, boolean includeContent, boolean recursive) {
+        try {
+            System.out.println("Copy (" + toCopyObj + ") under (" + newParent + ")");
+            JEVisObject newObject = newParent.buildObject(newName, toCopyObj.getJEVisClass());
+
+            for (JEVisAttribute originalAtt : toCopyObj.getAttributes()) {
+                JEVisAttribute newAtt = newObject.getAttribute(originalAtt.getType());
+                //Copy the basic attribute config
+                newAtt.setDisplaySampleRate(originalAtt.getDisplaySampleRate());
+                newAtt.setDisplayUnit(originalAtt.getDisplayUnit());
+                newAtt.setInputSampleRate(originalAtt.getInputSampleRate());
+                newAtt.setInputUnit(originalAtt.getInputUnit());
+
+                //if chosen copy the samples
+                if (includeContent) {
+                    if (originalAtt.hasSample()) {
+
+                        List<JEVisSample> newSamples = new ArrayList<>();
+                        for (JEVisSample sample : originalAtt.getAllSamples()) {
+                            newSamples.add(newAtt.buildSample(sample.getTimestamp(), sample.getValue(), sample.getNote()));
+                        }
+                        newAtt.addSamples(newSamples);
+                    }
+                }
+            }
+
+            //TODO: we need an recursive check to avoid an endless loop
+            //Also copy the children if chosen
+            if (recursive) {
+                for (JEVisObject otherChild : toCopyObj.getChildren()) {
+                    System.out.println("Copy Child: " + otherChild);
+                    copyObject(otherChild, newObject, otherChild.getName(), includeContent, recursive);
+                }
+            }
+
+            TreeItem<JEVisObject> dragTargetItem = getObjectTreeItem(newParent);
+            TreeItem<JEVisObject> newItem = getObjectTreeItem(newObject);
+
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("new GUI Item");
+                    getChildrenList(dragTargetItem).add(newItem);
+
+                }
+            });
+
+        } catch (JEVisException ex) {
+            Logger.getLogger(ObjectCell.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
+        }
+    }
+
     /**
      *
      * @param linkSrcObj
@@ -689,7 +746,7 @@ public class ObjectTree extends TreeView<JEVisObject> {
             }
 
         } catch (JEVisException ex) {
-            Logger.getLogger(ObjectCell.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ObjectTree.class.getName()).log(Level.SEVERE, null, ex);
             ex.printStackTrace();
         }
     }
@@ -700,6 +757,7 @@ public class ObjectTree extends TreeView<JEVisObject> {
      * @param targetParent
      */
     private void showMoveDialog(JEVisObject dragObj, JEVisObject targetParent) {
+        System.out.println("showMoveDialog: romove: " + dragObj + "  targetParent: " + targetParent);
         CopyObjectDialog dia = new CopyObjectDialog();
         CopyObjectDialog.Response re = dia.show(JEConfig.getStage(), dragObj, targetParent);
 
@@ -708,13 +766,21 @@ public class ObjectTree extends TreeView<JEVisObject> {
         } else if (re == CopyObjectDialog.Response.LINK) {
             buildLinkObject(dragObj, targetParent, dia.getCreateName());
         } else if (re == CopyObjectDialog.Response.COPY) {
-//                            if (dia.getCreateCount() > 1) {
-//                                String name = dia.getCreateName();
-//                                for (int i = 0; i < dia.getCreateCount(); ++i) {
-//                                    linkObject(getDragItem(), obj, dia.getCreateName());
-//                                }
-        } else if (re == CopyObjectDialog.Response.CLONE) {
+            System.out.println("Move action");
 
+            String name = dia.getCreateName();
+            for (int i = 0; i < dia.getCreateCount(); ++i) {
+
+                copyObject(dragObj, targetParent, name, false, true);
+            }
+
+        } else if (re == CopyObjectDialog.Response.CLONE) {
+            System.out.println("Clone action");
+            String name = dia.getCreateName();
+            for (int i = 0; i < dia.getCreateCount(); ++i) {
+
+                copyObject(dragObj, targetParent, name, true, true);
+            }
         }
     }
 
@@ -725,8 +791,10 @@ public class ObjectTree extends TreeView<JEVisObject> {
 
         @Override
         protected void updateItem(final JEVisObject obj, boolean emty) {
+
             super.updateItem(obj, emty);
             if (!emty) {
+                System.out.print("->");
                 ObjectGraphic grph = getObjectGraphic(obj);
                 setText(grph.getText());
                 setGraphic(grph.getGraphic());
@@ -756,7 +824,7 @@ public class ObjectTree extends TreeView<JEVisObject> {
                 setOnDragDone(new EventHandler<DragEvent>() {
                     @Override
                     public void handle(DragEvent dragEvent) {
-//                        System.out.println("Drag done on " + obj.getName());
+                        System.out.println("Drag done on " + obj.getName());
                         dragEvent.consume();
                         _isDrag = false;
                     }
@@ -766,7 +834,7 @@ public class ObjectTree extends TreeView<JEVisObject> {
                 setOnDragOver(new EventHandler<DragEvent>() {
                     @Override
                     public void handle(DragEvent dragEvent) {
-//                        System.out.println("Drag Over: " + obj.getName());
+                        System.out.println("Drag Over: " + obj.getName());
 
                         try {
                             if (getDragItem().isAllowedUnder(obj)) {
@@ -807,6 +875,9 @@ public class ObjectTree extends TreeView<JEVisObject> {
                     }
                 });
 
+            } else {
+                setText(null);
+                setGraphic(null);
             }
 
         }

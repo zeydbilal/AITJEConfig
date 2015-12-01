@@ -95,11 +95,11 @@ public class MemberExtension implements ObjectEditorExtension {
      * @throws JEVisException
      */
     private void buildView(final JEVisObject obj) throws JEVisException {
-        System.out.println("Build Member GUI for object: " + obj.getName());
+//        System.out.println("Build Member GUI for object: " + obj.getName());
         //First load all users the that the API has the allready cached befor loading the relationhsips
         //TODO: this could be a bad is the system has a lot of users and the current user is the system user
         List<JEVisObject> allUsers = obj.getDataSource().getObjects(obj.getDataSource().getJEVisClass("User"), true);
-        System.out.println("Total User count: " + allUsers.size());
+//        System.out.println("Total User count: " + allUsers.size());
 
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(5, 0, 20, 20));
@@ -382,12 +382,12 @@ public class MemberExtension implements ObjectEditorExtension {
             });
 
             for (JEVisObject user : allUsers) {
-                System.out.print("User in box: " + user.getName());
+//                System.out.print("User in box: " + user.getName());
                 if (!members.containsKey(user)) {
-                    System.out.println(" is not member yet");
+//                    System.out.println(" is not member yet");
                     users.getItems().add(user);
                 } else {
-                    System.out.println(" is allready member");
+//                    System.out.println(" is allready member");
                 }
 
             }
