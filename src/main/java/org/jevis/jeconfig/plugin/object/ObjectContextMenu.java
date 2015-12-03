@@ -25,12 +25,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import org.jevis.api.JEVisClass;
 import org.jevis.api.JEVisException;
@@ -54,16 +54,44 @@ public class ObjectContextMenu extends ContextMenu {
         _obj = obj;
         _tree = tree;
 
-        getItems().add(buildMenuNew());
-
+//        getItems().add(buildMenuNew());
         getItems().setAll(
                 buildNew2(),
                 new SeparatorMenuItem(),
                 buildDelete(),
                 buildRename(),
+                buildCopy(),
+                buildPaste(),
                 buildExport()
         );
 
+    }
+
+    private MenuItem buildPaste() {
+        //TODO: diable if not allowed
+        MenuItem menu = new MenuItem("Paste", JEConfig.getImage("17_Paste_48x48.png", 20, 20));
+        menu.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                _tree.pasteCopyItem();
+            }
+        }
+        );
+        return menu;
+    }
+
+    private MenuItem buildCopy() {
+        MenuItem menu = new MenuItem("Copy", JEConfig.getImage("16_Copy_48x48.png", 20, 20));
+        menu.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                _tree.copyCurrentItem();
+            }
+        }
+        );
+        return menu;
     }
 
     private MenuItem buildExport() {
@@ -155,7 +183,7 @@ public class ObjectContextMenu extends ContextMenu {
     }
 
     private MenuItem buildRename() {
-        MenuItem menu = new MenuItem("Rename");
+        MenuItem menu = new MenuItem("Rename", JEConfig.getImage("Rename.png", 20, 20));
         menu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
