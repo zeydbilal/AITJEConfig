@@ -18,6 +18,7 @@
 package org.jevis.jeconfig.structurewizard;
 
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -33,11 +34,14 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.jevis.jeconfig.structurewizard.WizardSelectedObject;
@@ -61,8 +65,12 @@ public class AutomatedWizardStep2 extends WizardPane {
     private TextField localManagerIPTxtf;
     private TextField databaseUserTxtf;
     private TextField databasePwdTxtf;
+    TextField fileNameTxt;
     private Task task;
     private Thread thread;
+    TextField fileTxt;
+    Button chooseBtn;
+    RadioButton loadLocalFileRbtn;
     
     /**
      * 
@@ -137,11 +145,57 @@ public class AutomatedWizardStep2 extends WizardPane {
         databasePwdTxtf.setPrefWidth(200);
 
         Button button = new Button("Start Structure Creation");
+        
+        loadLocalFileRbtn = new RadioButton("Load Sensor File");
+        loadLocalFileRbtn.setOnAction(new EventHandler<ActionEvent>() {
 
-        gridpane.addRow(0, localManagerIPLbl, localManagerIPTxtf);
-        gridpane.addRow(1, databaseUserLbl, databaseUserTxtf);
-        gridpane.addRow(2, databasePwdLbl, databasePwdTxtf);
-        gridpane.addRow(3, button);
+            @Override
+            public void handle(ActionEvent arg0) {
+                if (loadLocalFileRbtn.isSelected()) {
+                  chooseBtn.setVisible(true);
+                  fileTxt.setVisible(true);
+                }else{
+                    chooseBtn.setVisible(false);
+                    fileTxt.setVisible(false);
+                }
+            }
+        });
+        
+         fileTxt = new TextField();
+         fileTxt.setVisible(false);
+        FileChooser fileChooser = new FileChooser();
+        
+        //Label fileName = new Label("File Name");
+        //fileNameTxt = new TextField();
+        
+        chooseBtn = new Button("Choose File");
+        chooseBtn.setVisible(false);
+        chooseBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                
+                
+                
+                File selectedFile = fileChooser.showOpenDialog(null);
+                
+                if (selectedFile != null) {
+                    fileTxt.setText(selectedFile.getPath());
+                } else {
+                    fileTxt.setText("File selection cancelled.");
+                }
+            }
+        });
+        
+        
+        
+        int i = 0;
+        gridpane.addRow(i++, localManagerIPLbl, localManagerIPTxtf);
+        gridpane.addRow(i++, databaseUserLbl, databaseUserTxtf);
+        gridpane.addRow(i++, databasePwdLbl, databasePwdTxtf);
+        gridpane.addRow(i++, loadLocalFileRbtn);
+        gridpane.addRow(i++, chooseBtn, fileTxt);
+        gridpane.addRow(i++, button);
+        
+        
         gridpane.setHgap(10);//horizontal gap in pixels 
         gridpane.setVgap(10);//vertical gap in pixels
         gridpane.setPadding(new Insets(50, 10, 10, 10));////margins around the whole grid
@@ -182,6 +236,11 @@ public class AutomatedWizardStep2 extends WizardPane {
                     protected Object call() throws Exception {
                         try {  
                                 WiotechStructureCreator wsc = new WiotechStructureCreator(localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", databaseUserTxtf.getText(), databasePwdTxtf.getText());
+                                if(loadLocalFileRbtn.isSelected()){
+                                    wsc.readSensorDetails(fileTxt.getText());
+                                }else{
+                                    wsc.getSensorDetails();
+                                }
                                 wsc.createStructure(tree, wizardSelectedObject.getCurrentSelectedBuildingObject());
                                 wizardSelectedObject.setCurrentSelectedBuildingObject(wizardSelectedObject.getCurrentSelectedBuildingObject().getChildren().get(0));
                                 Platform.runLater(() ->creationStatus.setVisible(false));

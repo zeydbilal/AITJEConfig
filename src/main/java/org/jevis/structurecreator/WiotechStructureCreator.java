@@ -19,6 +19,10 @@
 package org.jevis.structurecreator;
 
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -101,9 +105,9 @@ public class WiotechStructureCreator {
         this._dbPW = dbPW;
        
         String url = loadJDBC(_host, _port, _schema, _dbUser, _dbPW);
-        getSensorDetails();
+        
     }
-
+    
     /**
      * 
      * Creates the needed JEVis structure
@@ -198,7 +202,7 @@ public class WiotechStructureCreator {
      * Reads the sensor details from the wiotech local manager db and stores it in a List of sensor types
      * 
      */
-    private void getSensorDetails() throws SQLException{
+    public void getSensorDetails() throws SQLException{
 
             String sql_query = "select macs.MACAddr, macs.NwkAddr, tabs.TABLE_NAME " +
                             "from db_lm_cbv2._cbv2_macnwkaddr as macs " +
@@ -214,6 +218,33 @@ public class WiotechStructureCreator {
                     _result.add(new Sensor(sensorDetails));
                 }
             }
+    }
+    
+        public void readSensorDetails(String path){
+
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(path);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            _result = (ArrayList<Sensor>) ois.readObject();
+            
+            ois.close();
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        } catch (IOException ex) {
+            Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fis.close();
+            } catch (IOException ex) {
+                Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        
     }
     
     /**

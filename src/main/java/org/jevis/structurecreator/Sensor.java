@@ -17,13 +17,17 @@
  */
 package org.jevis.structurecreator;
 
+import java.io.Serializable;
+
 /**
  * This class is used for collecting Wiotech sensor details
  * 
  * TODO change unicode string for CO2 in convertAndSetUnit()
  */
-public class Sensor {
+public class Sensor implements Serializable{
 
+    
+    private static final long serialVersionUID = 6659106543797L;
     private String name;
     //private String prefix;
     /**
