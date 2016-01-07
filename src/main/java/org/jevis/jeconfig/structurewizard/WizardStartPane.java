@@ -62,7 +62,7 @@ public class WizardStartPane extends WizardPane {
 
         vbox.setSpacing(30);
 
-        vbox.getChildren().addAll(index, manual, automated);
+        vbox.getChildren().addAll(index, manual , automated);
         vbox.setPadding(new Insets(200, 10, 10, 20));
 
         return vbox;

@@ -19,9 +19,14 @@ package org.jevis.jeconfig.structurewizard;
 
 
 import java.io.File;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -37,6 +42,8 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -44,8 +51,10 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
+import org.jevis.api.JEVisException;
 import org.jevis.jeconfig.structurewizard.WizardSelectedObject;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
+import org.jevis.structurecreator.Sensor;
 import org.jevis.structurecreator.WiotechStructureCreator;
 
 /**
@@ -70,7 +79,8 @@ public class AutomatedWizardStep2 extends WizardPane {
     private Thread thread;
     TextField fileTxt;
     Button chooseBtn;
-    RadioButton loadLocalFileRbtn;
+    RadioButton fileRbtn;
+    
     
     /**
      * 
@@ -132,44 +142,33 @@ public class AutomatedWizardStep2 extends WizardPane {
         GridPane gridpane = new GridPane();
         creationStatus = new ProgressBar();
         
-        Label localManagerIPLbl = new Label("Local Manager IP:");
-        localManagerIPTxtf = new TextField();
+        Label localManagerIPLbl = new Label("Local Manager IP(optional):");
+        localManagerIPTxtf = new TextField("localhost");
         localManagerIPTxtf.setPrefWidth(200);
         
-        Label databaseUserLbl = new Label("DB User");
+        Label databaseUserLbl = new Label("Local Manager Database User(optional):");
         databaseUserTxtf = new TextField();
         databaseUserTxtf.setPrefWidth(200);
         
-        Label databasePwdLbl = new Label("DB Password");
+        Label databasePwdLbl = new Label("Local Manager Databease Password(optional):");
         databasePwdTxtf = new TextField();
         databasePwdTxtf.setPrefWidth(200);
 
         Button button = new Button("Start Structure Creation");
         
-        loadLocalFileRbtn = new RadioButton("Load Sensor File");
-        loadLocalFileRbtn.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                if (loadLocalFileRbtn.isSelected()) {
-                  chooseBtn.setVisible(true);
-                  fileTxt.setVisible(true);
-                }else{
-                    chooseBtn.setVisible(false);
-                    fileTxt.setVisible(false);
-                }
-            }
-        });
+        
+        
         
          fileTxt = new TextField();
-         fileTxt.setVisible(false);
+         
         FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Wiotech Config File(*.config)", "*.config");
+        fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All (*.*)", "*.*"));
         
-        //Label fileName = new Label("File Name");
-        //fileNameTxt = new TextField();
         
-        chooseBtn = new Button("Choose File");
-        chooseBtn.setVisible(false);
+        chooseBtn = new Button("Choose Config File");
+        
         chooseBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 
@@ -185,15 +184,44 @@ public class AutomatedWizardStep2 extends WizardPane {
             }
         });
         
-        
+        ToggleGroup group = new ToggleGroup();
+        fileRbtn = new RadioButton("Load Structure from Wiotech Sensor Config File");
+        fileRbtn.setToggleGroup(group);
+        fileRbtn.setSelected(true);
+
+        RadioButton viaDbRbtn = new RadioButton("Load Structure from Local Manager");
+        viaDbRbtn.setToggleGroup(group);
+
+        group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> ov,
+                    Toggle old_toggle, Toggle new_toggle) {
+                if (fileRbtn.isSelected()) {
+                    chooseBtn.setVisible(true);
+                    fileTxt.setVisible(true);
+                    
+                    localManagerIPLbl.setText("Local Manager IP(optional):");
+                    databaseUserLbl.setText("Local Manager Database User(optional):");                  
+                    databasePwdLbl.setText("Local Manager Databease Password(optional):");
+                    
+                } else if (viaDbRbtn.isSelected()) {
+                    localManagerIPLbl.setText("Local Manager IP:");
+                    databaseUserLbl.setText("Local Manager Database User:");                  
+                    databasePwdLbl.setText("Local Manager Databease Password:");
+                    chooseBtn.setVisible(false);
+                    fileTxt.setVisible(false);
+                }
+            }
+        });
         
         int i = 0;
+        gridpane.addRow(i++,new Label("Select creation mode:") );
+        gridpane.addRow(i++, fileRbtn, viaDbRbtn);
         gridpane.addRow(i++, localManagerIPLbl, localManagerIPTxtf);
         gridpane.addRow(i++, databaseUserLbl, databaseUserTxtf);
         gridpane.addRow(i++, databasePwdLbl, databasePwdTxtf);
-        gridpane.addRow(i++, loadLocalFileRbtn);
         gridpane.addRow(i++, chooseBtn, fileTxt);
-        gridpane.addRow(i++, button);
+        gridpane.addRow(i++, button,creationStatus);
         
         
         gridpane.setHgap(10);//horizontal gap in pixels 
@@ -203,8 +231,8 @@ public class AutomatedWizardStep2 extends WizardPane {
         doneLbl = new Label("Structure Created");
         doneLbl.setVisible(false);
         VBox labelVBox = new VBox(doneLbl);
-        gridpane.addRow(4, labelVBox);
-        gridpane.add(creationStatus, 1, 3);
+        gridpane.addRow(i++, labelVBox);
+        
         creationStatus.setVisible(false);
         //errorLbl = new Label();
         errorLbl = new TextArea();
@@ -235,22 +263,27 @@ public class AutomatedWizardStep2 extends WizardPane {
                     @Override
                     protected Object call() throws Exception {
                         try {  
-                                WiotechStructureCreator wsc = new WiotechStructureCreator(localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", databaseUserTxtf.getText(), databasePwdTxtf.getText());
-                                if(loadLocalFileRbtn.isSelected()){
-                                    wsc.readSensorDetails(fileTxt.getText());
-                                }else{
-                                    wsc.getSensorDetails();
-                                }
-                                wsc.createStructure(tree, wizardSelectedObject.getCurrentSelectedBuildingObject());
-                                wizardSelectedObject.setCurrentSelectedBuildingObject(wizardSelectedObject.getCurrentSelectedBuildingObject().getChildren().get(0));
-                                Platform.runLater(() ->creationStatus.setVisible(false));
-                                Platform.runLater(() ->doneLbl.setVisible(true));
+                            WiotechStructureCreator wsc;
+                            if(fileRbtn.isSelected()){
+                                List<Sensor> _result =  WiotechStructureCreator.readSensorDetails(fileTxt.getText());
+                                wsc = new WiotechStructureCreator(_result);
+                                
+                            }else{
+                                wsc = new WiotechStructureCreator(localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", 
+                                databaseUserTxtf.getText(), databasePwdTxtf.getText());
+
+                                wsc.getSensorDetails();
+                            }
+                            wsc.createStructure(tree, wizardSelectedObject.getCurrentSelectedBuildingObject());
+                            wizardSelectedObject.setCurrentSelectedBuildingObject(wizardSelectedObject.getCurrentSelectedBuildingObject().getChildren().get(0));
+                            Platform.runLater(() ->creationStatus.setVisible(false));
+                            Platform.runLater(() ->doneLbl.setVisible(true));
                         } catch (Exception ex) {
-                                Platform.runLater(() ->errorLbl.setVisible(true));  
-                                Platform.runLater(() ->errorLbl.setText(ex.getMessage()));
-                                Platform.runLater(() ->creationStatus.setVisible(false));
-                                ex.printStackTrace();
-                         }
+                            Platform.runLater(() ->errorLbl.setVisible(true));  
+                            Platform.runLater(() ->errorLbl.setText(ex.getMessage()));
+                            Platform.runLater(() ->creationStatus.setVisible(false));
+                            ex.printStackTrace();
+                        } 
                             
                         return null;
                     }

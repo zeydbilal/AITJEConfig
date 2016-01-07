@@ -78,7 +78,7 @@ public class WiotechStructureCreator {
     private static String _schema;
     private static String _dbUser;
     private static String _dbPW;
-    private ObjectTree tree;
+    private  ObjectTree tree;
     /**
      * The JEVisDataSource is the central class handling the connection to the
      * JEVis Server
@@ -106,6 +106,11 @@ public class WiotechStructureCreator {
        
         String url = loadJDBC(_host, _port, _schema, _dbUser, _dbPW);
         
+    }
+    
+    public WiotechStructureCreator(List<Sensor> sensorList){
+        
+        this._result = sensorList;
     }
     
     /**
@@ -220,7 +225,7 @@ public class WiotechStructureCreator {
             }
     }
     
-        public void readSensorDetails(String path){
+        public static List<Sensor> readSensorDetails(String path){
 
         FileInputStream fis = null;
         try {
@@ -243,7 +248,7 @@ public class WiotechStructureCreator {
                 Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+        return _result;
         
     }
     
