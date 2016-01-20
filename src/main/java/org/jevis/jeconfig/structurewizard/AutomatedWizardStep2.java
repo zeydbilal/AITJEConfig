@@ -22,6 +22,7 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -33,7 +34,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -47,6 +50,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.controlsfx.dialog.Wizard;
@@ -80,6 +84,15 @@ public class AutomatedWizardStep2 extends WizardPane {
     TextField fileTxt;
     Button chooseBtn;
     RadioButton fileRbtn;
+    
+    TextField minTempTxt;
+    TextField maxTempTxt;
+        
+    TextField minHumTxt;
+    TextField maxHumTxt;
+        
+    TextField minCo2Txt;
+    TextField maxCo2Txt;
     
     
     /**
@@ -119,6 +132,9 @@ public class AutomatedWizardStep2 extends WizardPane {
                           
                     }
                 });
+            }else if (type.getButtonData().equals(ButtonBar.ButtonData.FINISH)) {
+                Node finish = lookupButton(type);
+                finish.visibleProperty().setValue(Boolean.FALSE);
             }
         }
     }
@@ -142,24 +158,24 @@ public class AutomatedWizardStep2 extends WizardPane {
         GridPane gridpane = new GridPane();
         creationStatus = new ProgressBar();
         
-        Label localManagerIPLbl = new Label("Local Manager IP(optional):");
+        Label localManagerIPLbl = new Label("Local Manager IP:");
         localManagerIPTxtf = new TextField("localhost");
         localManagerIPTxtf.setPrefWidth(200);
         
-        Label databaseUserLbl = new Label("Local Manager Database User(optional):");
+        Label databaseUserLbl = new Label("Local Manager Database User:");
         databaseUserTxtf = new TextField();
         databaseUserTxtf.setPrefWidth(200);
         
-        Label databasePwdLbl = new Label("Local Manager Databease Password(optional):");
+        Label databasePwdLbl = new Label("Local Manager Databease Password:");
         databasePwdTxtf = new TextField();
         databasePwdTxtf.setPrefWidth(200);
 
-        Button button = new Button("Start Structure Creation");
+        Button startStructureCreationBtn = new Button("Start Structure Creation");
         
         
         
         
-         fileTxt = new TextField();
+         fileTxt = new TextField("sensors.config");
          
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Wiotech Config File(*.config)", "*.config");
@@ -221,17 +237,18 @@ public class AutomatedWizardStep2 extends WizardPane {
         gridpane.addRow(i++, databaseUserLbl, databaseUserTxtf);
         gridpane.addRow(i++, databasePwdLbl, databasePwdTxtf);
         gridpane.addRow(i++, chooseBtn, fileTxt);
-        gridpane.addRow(i++, button,creationStatus);
+        gridpane.addRow(i++, startStructureCreationBtn,creationStatus);
         
         
         gridpane.setHgap(10);//horizontal gap in pixels 
         gridpane.setVgap(10);//vertical gap in pixels
         gridpane.setPadding(new Insets(50, 10, 10, 10));////margins around the whole grid
         
-        doneLbl = new Label("Structure Created");
+        doneLbl = new Label("Structure Created"); 
         doneLbl.setVisible(false);
         VBox labelVBox = new VBox(doneLbl);
-        gridpane.addRow(i++, labelVBox);
+        labelVBox.setAlignment(Pos.CENTER);
+        
         
         creationStatus.setVisible(false);
         //errorLbl = new Label();
@@ -239,9 +256,10 @@ public class AutomatedWizardStep2 extends WizardPane {
         errorLbl.setVisible(false);
 
         // event listener for the start button
-        button.setOnAction(new EventHandler<ActionEvent>() {
+        startStructureCreationBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 
+
                 creationStatus.setVisible(true);
                 execStructurCreation();
                 thread = new Thread (task);
@@ -249,7 +267,62 @@ public class AutomatedWizardStep2 extends WizardPane {
                  
             }
         });
-        root.setBottom(errorLbl);
+        
+        
+        
+        GridPane defaultValGP = new GridPane();
+        defaultValGP.setHgap(10);//horizontal gap in pixels 
+        defaultValGP.setVgap(10);//vertical gap in pixels
+        defaultValGP.setPadding(new Insets(50, 10, 10, 10));////margins around the whole grid
+        
+        Label min = new Label("Min Value");
+        Label max = new Label("Max Value");
+        Label qwe = new Label();
+        qwe.setVisible(false);
+        Label tempLbl = new Label("Process Temp Value");
+        Label humLbl = new Label("Process Humidity Value");
+        Label CO2Lbl = new Label("Process CO2 Value");
+        
+        Label unitTemp = new Label("\u00b0C");
+        Label unitrH = new Label("\u0025");
+        Label unitCO2 = new Label("\u2030");
+        
+        Label helpTextLbl = new Label("Values beyond process vallue boundaries will be marked as erroneous. Choose carefully! ");
+        
+        minTempTxt = new TextField("10");
+        //minTempTxt.setPromptText("Min Temp in \u00b0C");
+        maxTempTxt = new TextField("40");
+        //maxTempTxt.setPromptText("Max Temp in \u00b0C");
+        
+        minHumTxt = new TextField("10");
+        //minHumTxt.setPromptText("Min Humidity in \u0025");
+        maxHumTxt = new TextField("100");
+        //maxHumTxt.setPromptText("Max Humidity in \u0025");
+        
+        minCo2Txt = new TextField("200");
+        //minCo2Txt.setPromptText("Min CO2 in \u2030");
+        maxCo2Txt = new TextField("4000");
+        //maxCo2Txt.setPromptText("Max Co2 in \u2030");
+        
+        defaultValGP.addRow(0, qwe, min, max);
+        defaultValGP.addRow(1, tempLbl, minTempTxt, maxTempTxt,unitTemp);
+        defaultValGP.addRow(2, humLbl, minHumTxt, maxHumTxt, unitrH);
+        defaultValGP.addRow(3, CO2Lbl, minCo2Txt, maxCo2Txt, unitCO2);
+        
+        GridPane bottomGP = new GridPane();
+        bottomGP.setAlignment(Pos.CENTER);
+        bottomGP.setHgap(10);//horizontal gap in pixels 
+        bottomGP.setVgap(10);//vertical gap in pixels
+        bottomGP.setPadding(new Insets(50, 10, 10, 10));////margins around the whole grid
+        
+        
+        bottomGP.addRow(0, startStructureCreationBtn);        
+        bottomGP.addRow(1, labelVBox);
+        bottomGP.addRow(2, errorLbl);
+        
+        
+        root.setCenter(new VBox(helpTextLbl, defaultValGP));
+        root.setBottom(bottomGP);
         root.setTop(gridpane);
         return root;
     }
@@ -266,7 +339,8 @@ public class AutomatedWizardStep2 extends WizardPane {
                             WiotechStructureCreator wsc;
                             if(fileRbtn.isSelected()){
                                 List<Sensor> _result =  WiotechStructureCreator.readSensorDetails(fileTxt.getText());
-                                wsc = new WiotechStructureCreator(_result);
+                                wsc = new WiotechStructureCreator(_result, localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", 
+                                databaseUserTxtf.getText(), databasePwdTxtf.getText());
                                 
                             }else{
                                 wsc = new WiotechStructureCreator(localManagerIPTxtf.getText(), 3306, "db_lm_cbv2", 
@@ -274,10 +348,36 @@ public class AutomatedWizardStep2 extends WizardPane {
 
                                 wsc.getSensorDetails();
                             }
+                            String[] defaults = new String[6];
+                            defaults[0] = minTempTxt.getText();
+                            defaults[1] = maxTempTxt.getText();
+                            defaults[2] = minHumTxt.getText();
+                            defaults[3] = maxHumTxt.getText();
+                            defaults[4] = minCo2Txt.getText();
+                            defaults[5] = maxCo2Txt.getText();
+                                    
+                            wsc.setDefaults(defaults);
                             wsc.createStructure(tree, wizardSelectedObject.getCurrentSelectedBuildingObject());
                             wizardSelectedObject.setCurrentSelectedBuildingObject(wizardSelectedObject.getCurrentSelectedBuildingObject().getChildren().get(0));
                             Platform.runLater(() ->creationStatus.setVisible(false));
                             Platform.runLater(() ->doneLbl.setVisible(true));
+                            
+                            ObservableList<ButtonType> list = getButtonTypes();
+                            for (ButtonType type : list) {
+                                // Set Finish button visible
+                                if (type.getButtonData().equals(ButtonBar.ButtonData.FINISH)) {
+                                    Node finish = lookupButton(type);
+                                    finish.visibleProperty().setValue(Boolean.TRUE);
+                                }
+                            }
+                            
+                            
+                           /* Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Automated Structure Creator");
+                            alert.setHeaderText(null);
+                            alert.setContentText("JEVis Structure Created Sucessfully");
+
+                            Optional<ButtonType> result = alert.showAndWait();*/
                         } catch (Exception ex) {
                             Platform.runLater(() ->errorLbl.setVisible(true));  
                             Platform.runLater(() ->errorLbl.setText(ex.getMessage()));

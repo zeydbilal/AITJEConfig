@@ -22,9 +22,11 @@ import org.jevis.jeconfig.structurewizard.ManualWizardStep2;
 import org.jevis.jeconfig.structurewizard.AutomatedWizardStep1;
 import org.jevis.jeconfig.structurewizard.ManualWizardStep4;
 import org.jevis.jeconfig.structurewizard.ManualWizardStep1;
-import org.jevis.jeconfig.structurewizard.AutomatedWizardStep2;
+//import org.jevis.jeconfig.structurewizard.AutomatedWizardStep2;
 import org.jevis.jeconfig.structurewizard.WizardStartPane;
 import java.util.Optional;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.jevis.api.JEVisObject;
@@ -99,8 +101,8 @@ public class WizardMain extends Wizard {
                 } else if (currentPage.equals(wizardStartPane) && wizardStartPane.getControl().equals("Automated Wiotech Structure Creation")) {
                     return automatedWizardStep1;
                 } else if (currentPage.equals(automatedWizardStep1)) {
-                    return automatedWizardStep2;
-                } else {
+                       return automatedWizardStep2;
+                    } else {
                     return null;
                 }
             }

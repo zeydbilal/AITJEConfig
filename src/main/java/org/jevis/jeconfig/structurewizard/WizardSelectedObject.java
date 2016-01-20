@@ -21,6 +21,8 @@ public class WizardSelectedObject {
     private JEVisObject currentDataDirectory;
     private JEVisObject currentDataPointDirectory;
 
+      
+            
     public WizardSelectedObject() {
     }
 

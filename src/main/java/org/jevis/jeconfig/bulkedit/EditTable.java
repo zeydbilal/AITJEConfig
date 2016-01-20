@@ -90,6 +90,13 @@ public class EditTable {
 
     private void addListChildren(JEVisObject parent, JEVisClass selectedClass) {
         try {
+            
+            List<JEVisObject> childList = parent.getChildren();
+            for(JEVisObject child : childList){
+                for (int i = 0; i < child.getChildren (selectedClass, false).size(); i++) {
+                    listChildren.add(child.getChildren(selectedClass, false).get(i));
+                }
+            }
             for (int i = 0; i < parent.getChildren(selectedClass, false).size(); i++) {
                 listChildren.add(parent.getChildren(selectedClass, false).get(i));
             }
@@ -233,24 +240,15 @@ public class EditTable {
 
             @Override
             public void handle(ActionEvent event) {
-                try {
-                    rows.clear();
-                    columnHeaderNames.clear();
-                    columnHeaderNamesDataTable.clear();
-                    pairList.clear();
-                    listChildren.clear();
-                    selectedClass = classComboBox.getSelectionModel().getSelectedItem();
-                    addListChildren(parent, selectedClass);
-                    if (selectedClass.getName().equals("Data")) {
-                        new CreateNewDataEditTable(parent, editBtn);
-                        root.setCenter(spv);
-                    } else {
-                        new CreateNewEditTable(parent);
-                        root.setCenter(spv);
-                    }
-                } catch (JEVisException ex) {
-                    Logger.getLogger(EditTable.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                rows.clear();
+                columnHeaderNames.clear();
+                columnHeaderNamesDataTable.clear();
+                pairList.clear();
+                listChildren.clear();
+                selectedClass = classComboBox.getSelectionModel().getSelectedItem();
+                addListChildren(parent, selectedClass);
+                new CreateNewEditTable(parent);
+                root.setCenter(spv);
             }
         });
 
@@ -410,7 +408,7 @@ public class EditTable {
 
             rowCount = getListChildren().size();
             columnCount = colNames.length;
-
+            
             grid = new GridBase(rowCount, columnCount);
 
             for (int row = 0; row < grid.getRowCount(); ++row) {
@@ -522,10 +520,10 @@ public class EditTable {
                             grid.setCellValue(i, counter, listObjectAndValueAttribute.get(i).getValue().get(k).getValue());
                             counter++;
                         }
-                    }
-                }
-            }
-
+                            }
+                            }
+                        }
+                        
             addUnits();
             addSymbols();
             //GridChange Event for Prefix and Symbol Input Control

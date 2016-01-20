@@ -19,6 +19,7 @@
 package org.jevis.jeconfig.structurewizard;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
@@ -26,9 +27,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -69,7 +74,7 @@ public class AutomatedWizardStep1 extends WizardPane {
     private ObjectTree tree;
     // global Object variable
     private WizardSelectedObject wizardSelectedObject;
-
+    Button test;
     /**
      *
      * @param parentObject Has to be 'Monitored Object Directory' node
@@ -94,7 +99,9 @@ public class AutomatedWizardStep1 extends WizardPane {
 
         BorderPane root = new BorderPane();
         GridPane gridpane = new GridPane();
-
+        
+         Label descriptionLbl = new Label("Select the Building to create the Structure");
+         
         Label newBuildingLbl = new Label("New Building Name");
 
         ObservableList<JEVisObject> options = FXCollections.observableArrayList();
@@ -174,22 +181,25 @@ public class AutomatedWizardStep1 extends WizardPane {
         newBuildingTxtf = new TextField();
         newBuildingTxtf.setPrefWidth(200);
 
-        gridpane.addRow(0, newBuildingLbl, newBuildingTxtf);
-        gridpane.addRow(1, new Label("Or select existing:"), classComboBox);
+        gridpane.addRow(0, descriptionLbl);
+        gridpane.addRow(1, newBuildingLbl, newBuildingTxtf);
+        gridpane.addRow(2, new Label("Or select existing:"), classComboBox);
 
         root.setTop(gridpane);
         return root;
     }
-
+    
     @Override
     public void onEnteringPage(Wizard wizard) {
 
         //Hides the 'Back' button
         ObservableList<ButtonType> list = getButtonTypes();
+        
         for (ButtonType type : list) {
             if (type.getButtonData().equals(ButtonBar.ButtonData.BACK_PREVIOUS)) {
                 Node prev = lookupButton(type);
                 prev.visibleProperty().setValue(Boolean.FALSE);
+                
             }
         }
     }
@@ -201,9 +211,12 @@ public class AutomatedWizardStep1 extends WizardPane {
      */
     @Override
     public void onExitingPage(Wizard wizard) {
-
+        
+        
         JEVisClass buildingClass = null;
         List<JEVisClass> listClasses = null;
+        
+       
         try {
             // Get the all allowed classes from selected parent
             listClasses = getParentObject().getAllowedChildrenClasses();
@@ -227,6 +240,13 @@ public class AutomatedWizardStep1 extends WizardPane {
             }
             // If buildingObject still null, create a new one
             if (buildingObject == null) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Create new Building");
+                alert.setHeaderText(null);
+                alert.setContentText("You are creating a new Building");
+
+                Optional<ButtonType> result = alert.showAndWait();
+
                 Logger.getLogger(ManualWizardStep1.class.getName()).log(Level.SEVERE, "new created");
                 buildingObject = getParentObject().buildObject(newBuildingTxtf.getText(), buildingClass);
                 //buildingObject.commit();

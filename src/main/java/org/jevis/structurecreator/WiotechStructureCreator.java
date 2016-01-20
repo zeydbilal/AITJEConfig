@@ -79,6 +79,14 @@ public class WiotechStructureCreator {
     private static String _dbUser;
     private static String _dbPW;
     private  ObjectTree tree;
+    
+    
+    private String minTemp;
+    private String maxTemp;
+    private String minHum;
+    private String maxHum;
+    private String minCo2;
+    private String maxCo2;
     /**
      * The JEVisDataSource is the central class handling the connection to the
      * JEVis Server
@@ -108,8 +116,12 @@ public class WiotechStructureCreator {
         
     }
     
-    public WiotechStructureCreator(List<Sensor> sensorList){
-        
+    public WiotechStructureCreator(List<Sensor> sensorList, String host, Integer port, String schema, String dbUser, String dbPW){
+        this._host = host;
+        this._port = port;
+        this._schema = schema;
+        this._dbUser = dbUser;
+        this._dbPW = dbPW;
         this._result = sensorList;
     }
     
@@ -163,6 +175,7 @@ public class WiotechStructureCreator {
                 
             ObjectAndBoolean sqlDPD = createObjectCheckNameExistance(channel.getJEVisObject().getID(), "SQL Data Point Directory", "DPD");
             ObjectAndBoolean sqlDP = createObjectCheckNameExistance(sqlDPD.getJEVisObject().getID(), "SQL Data Point", "DP");
+            //Structure with Deivces, not needed anymore!!!! 
             ObjectAndBoolean device = createObjectCheckNameExistance(dataDirectory.getJEVisObject().getID(), "Device", sensor.getName());
                 if(device.isNew){
                     long id =device.getJEVisObject().getID();
@@ -170,11 +183,32 @@ public class WiotechStructureCreator {
                 }
                 
             ObjectAndBoolean data = createObjectCheckNameExistance(device.getJEVisObject().getID(), "Data", sensor.getSymbol());
+            
+            //ObjectAndBoolean data = createObjectCheckNameExistance(dataDirectory.getJEVisObject().getID(), "Data", sensor.getName() + "_" + sensor.getSymbol());
+            
             try {
                 JEVisAttribute  attributeValue = data.getJEVisObject().getAttribute("Value");
                 attributeValue.setDisplayUnit(new JEVisUnitImp(Unit.valueOf(sensor.getUnit()), "", JEVisUnit.Prefix.NONE));
                 attributeValue.setInputUnit(new JEVisUnitImp(Unit.valueOf(sensor.getUnit()), "", JEVisUnit.Prefix.NONE));
                 attributeValue.commit();
+                
+                long dataNodeId = data.getJEVisObject().getID();
+                switch(sensor.getSymbol()){
+                    case "Temp":
+                        writeToJEVis(dataNodeId, "Process Min", minTemp);
+                        writeToJEVis(dataNodeId, "Process Max", maxTemp);
+                        break;
+                    case "CO2":
+                        writeToJEVis(dataNodeId, "Process Min", minCo2);
+                        writeToJEVis(dataNodeId, "Process Max", maxCo2);
+                        break;
+                    case "rH":
+                        writeToJEVis(dataNodeId, "Process Min", minHum);
+                        writeToJEVis(dataNodeId, "Process Max", maxHum);
+                        break;    
+                }
+
+                
             } catch (JEVisException ex) {
                 Logger.getLogger(WiotechStructureCreator.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -477,5 +511,14 @@ public class WiotechStructureCreator {
         public JEVisObject getJEVisObject(){
             return this.jeObject;
         }
+    }
+    public void setDefaults(String[] defaults){
+        this.minTemp = defaults[0];
+        this.maxTemp = defaults[1];
+        this.minHum = defaults[2];
+        this.maxHum = defaults[3];
+        this.minCo2 = defaults[4];
+        this.maxCo2 = defaults[5];
+        
     }
 }

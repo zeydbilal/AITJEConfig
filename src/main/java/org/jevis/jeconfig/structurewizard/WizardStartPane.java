@@ -38,7 +38,10 @@ public class WizardStartPane extends WizardPane {
         VBox vbox = new VBox();
 
         Label index = new Label();
-        index.setText("JEVIS setup ");
+        index.setText("Select JEVis Structure Mode\n\n"
+                + "Manual: Guided Structure Creation Mode\n\n"
+                + "Automated Wiotech Structure Creation:\n"
+                + "Creates the needed JEVis structure for a \nWiotech WSN Setup");
 
         ToggleGroup group = new ToggleGroup();
         manual = new RadioButton("Manual");
