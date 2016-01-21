@@ -37,7 +37,9 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
@@ -59,11 +61,13 @@ import javafx.stage.StageStyle;
 import org.jevis.api.JEVisClass;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
+import org.jevis.api.sql.RelationsManagment;
 import org.jevis.application.resource.ResourceLoader;
 import org.jevis.commons.CommonClasses;
 import org.jevis.jeconfig.tool.NumberSpinner;
 
 /**
+ * Dialog to prompt the user about the copy/clone/move action
  *
  * @author fs
  */
@@ -75,16 +79,21 @@ public class CopyObjectDialog {
     private String infoText = "";
     private TextField nameField = new TextField();
     private int createCount = 1;
+    private boolean recursionAllowed = false;
+    private boolean includeDataAllowed = true;
     final Button ok = new Button("OK");
 
     final RadioButton move = new RadioButton("Move");
     final RadioButton link = new RadioButton("Link");
     final RadioButton copy = new RadioButton("Copy");
-    final RadioButton clone = new RadioButton("Clone");
+//    final RadioButton clone = new RadioButton("Clone");
+    final CheckBox recursion = new CheckBox("Include substructure");
+    final CheckBox includeSamples = new CheckBox("Include data");
+    final NumberSpinner count = new NumberSpinner(BigDecimal.valueOf(1), BigDecimal.valueOf(1));
 
     public static enum Response {
 
-        MOVE, LINK, CANCEL, CLONE, COPY
+        MOVE, LINK, CANCEL, COPY //,CLONE
     };
 
     private Response response = Response.CANCEL;
@@ -97,9 +106,14 @@ public class CopyObjectDialog {
         return nameField.getText();
     }
 
+    public boolean isRecursion() {
+        return recursion.isSelected();
+    }
+
     public int getCreateCount() {
-        if (createCount > 0 && createCount < 100) {
-            return createCount;
+
+        if (count.getNumber().intValue() > 0 && count.getNumber().intValue() < 500) {
+            return count.getNumber().intValue();
         } else {
             return 1;
         }
@@ -115,6 +129,31 @@ public class CopyObjectDialog {
      * @return
      */
     public Response show(Stage owner, final JEVisObject object, final JEVisObject newParent) {
+
+        try {
+
+            if (!RelationsManagment.canCreate(object.getDataSource().getCurrentUser(), object)) {
+                showError("Error", "Permission denied", "You have no permission to create this object here");
+            }
+            if (!object.isAllowedUnder(newParent)) {
+                showError("Error", "Rules Error", "Its not allowed to create an '" + object.getJEVisClass().getName() + "' under an '" + newParent.getJEVisClass().getName()
+                        + "' object");
+                return Response.CANCEL;
+            }
+            //Dont allow recrusion if the process faild the resursion check
+            recursionAllowed = parentCheck(object, newParent);
+            recursion.setDisable(!recursionAllowed);
+            move.setDisable(!recursionAllowed);
+
+//            if (!parentCheck(object, newParent)) {
+//                return Response.CANCEL;
+//            }
+        } catch (JEVisException ex) {
+            Logger.getLogger(CopyObjectDialog.class.getName()).log(Level.SEVERE, null, ex);
+            showError("Error", ex.getMessage(), ex.getCause().getMessage());
+            return Response.CANCEL;
+        }
+
         final Stage stage = new Stage();
 
         final BooleanProperty isOK = new SimpleBooleanProperty(false);
@@ -129,9 +168,9 @@ public class CopyObjectDialog {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setWidth(450);
-        stage.setHeight(350);
+        stage.setHeight(400);
         stage.initStyle(StageStyle.UTILITY);
-        stage.setResizable(false);
+        stage.setResizable(true);
         scene.setCursor(Cursor.DEFAULT);
 
         BorderPane header = new BorderPane();
@@ -174,7 +213,7 @@ public class CopyObjectDialog {
         GridPane gp = new GridPane();
         gp.setPadding(new Insets(10));
         gp.setHgap(10);
-        gp.setVgap(5);
+        gp.setVgap(8);
 
         final ToggleGroup group = new ToggleGroup();
 
@@ -182,19 +221,19 @@ public class CopyObjectDialog {
         move.setMinWidth(120);
         link.setMaxWidth(Double.MAX_VALUE);
         copy.setMaxWidth(Double.MAX_VALUE);
-        clone.setMaxWidth(Double.MAX_VALUE);
+//        clone.setMaxWidth(Double.MAX_VALUE);
 
         link.setToggleGroup(group);
         move.setToggleGroup(group);
         copy.setToggleGroup(group);
-        clone.setToggleGroup(group);
+//        clone.setToggleGroup(group);
 
+        nameField.setPrefWidth(250);
         nameField.setPromptText("Name of the new object(s)");
 
         final Label nameLabel = new Label("Name:");
         final Label countLabel = new Label("Count:");
 
-        final NumberSpinner count = new NumberSpinner(BigDecimal.valueOf(1), BigDecimal.valueOf(1));
         final Label info = new Label("Test");
         info.wrapTextProperty().setValue(true);
 //        info.setPrefRowCount(4);
@@ -209,7 +248,7 @@ public class CopyObjectDialog {
             public void changed(ObservableValue<? extends Toggle> ov, Toggle t, Toggle t1) {
 
                 if (t1 != null) {
-                    System.out.println("new toggel: " + t1);
+//                    System.out.println("new toggel: " + t1);
                     if (t1.equals(move)) {
                         infoText = String.format("Move '%s' into '%s'", object.getName(), newParent.getName());
                         ok.setDisable(false);
@@ -217,33 +256,51 @@ public class CopyObjectDialog {
                         nameLabel.setDisable(true);
                         countLabel.setDisable(true);
                         count.setDisable(true);
+
+                        includeSamples.setDisable(true);
+                        includeSamples.setSelected(false);
+                        recursion.setDisable(true);
+                        recursion.setSelected(false);
+
                     } else if (t1.equals(link)) {
                         infoText = String.format("Create an new link of '%s' into '%s'", object.getName(), newParent.getName());
                         nameField.setDisable(false);
                         count.setDisable(true);
                         nameLabel.setDisable(false);
                         countLabel.setDisable(true);
+                        includeSamples.setDisable(true);
+                        includeSamples.setSelected(false);
+                        recursion.setDisable(true);
+                        recursion.setSelected(false);
+
                         checkName();
 
                     } else if (t1.equals(copy)) {
-                        infoText = String.format("Copy '%s' into '%s' without data", object.getName(), newParent.getName());
+                        infoText = String.format("Copy '%s' into '%s'", object.getName(), newParent.getName());
 
 //                        infoText = String.format("<html>Copy <font color=\"#DB6A6A\">'%s'</font> into <font color=\"#DB6A6A\">'%s'</font> without data</html>", object.getName(), newParent.getName());
                         nameField.setDisable(false);
                         count.setDisable(false);
                         nameLabel.setDisable(false);
                         countLabel.setDisable(false);
-                        nameField.setText("Copy of " + object.getName());
-                        checkName();
-                    } else if (t1.equals(clone)) {
-                        infoText = String.format("Clone '%s' into '%s' with all data", object.getName(), newParent.getName());
-                        nameField.setDisable(false);
-                        count.setDisable(false);
-                        nameLabel.setDisable(false);
-                        countLabel.setDisable(false);
-                        nameField.setText("Copy of " + object.getName());
+                        nameField.setText(object.getName());
+
+                        includeSamples.setDisable(!includeDataAllowed);
+                        includeSamples.setSelected(false);
+                        recursion.setDisable(!recursionAllowed);
+                        recursion.setSelected(false);
+
                         checkName();
                     }
+//                    else if (t1.equals(clone)) {
+//                        infoText = String.format("Clone '%s' into '%s' with all data", object.getName(), newParent.getName());
+//                        nameField.setDisable(false);
+//                        count.setDisable(false);
+//                        nameLabel.setDisable(false);
+//                        countLabel.setDisable(false);
+//                        nameField.setText(object.getName());
+//                        checkName();
+//                    }
 
                     Platform.runLater(new Runnable() {
                         @Override
@@ -257,10 +314,10 @@ public class CopyObjectDialog {
         });
 
         try {
-            System.out.println("-> Object: " + object.getJEVisClass());
-            System.out.println("newParent: " + newParent.getJEVisClass());
-            System.out.println("Is allowed under target: " + object.isAllowedUnder(newParent));
-            System.out.println("");
+//            System.out.println("-> Object: " + object.getJEVisClass());
+//            System.out.println("newParent: " + newParent.getJEVisClass());
+//            System.out.println("Is allowed under target: " + object.isAllowedUnder(newParent));
+//            System.out.println("");
 
             if (newParent.getJEVisClass().getName().equals("View Directory") || newParent.getJEVisClass().getName().equals(CommonClasses.LINK.NAME)) {
                 link.setDisable(false);
@@ -271,11 +328,11 @@ public class CopyObjectDialog {
             if (object.isAllowedUnder(newParent)) {
                 move.setDisable(false);
                 copy.setDisable(false);
-                clone.setDisable(false);
+//                clone.setDisable(false);
             } else {
                 move.setDisable(true);
                 copy.setDisable(true);
-                clone.setDisable(true);
+//                clone.setDisable(true);
             }
 
             if (!link.isDisable()) {
@@ -284,6 +341,8 @@ public class CopyObjectDialog {
                 ok.setDisable(false);
             } else if (!move.isDisable()) {
                 group.selectToggle(move);
+            } else if (!copy.isDisable()) {
+                group.selectToggle(copy);
             }
 
         } catch (JEVisException ex) {
@@ -293,7 +352,7 @@ public class CopyObjectDialog {
         HBox nameBox = new HBox(5);
         nameBox.getChildren().setAll(nameLabel, nameField);
         nameBox.setAlignment(Pos.CENTER_LEFT);
-        HBox countBox = new HBox(5);
+        final HBox countBox = new HBox(5);
         countBox.getChildren().setAll(countLabel, count);
         countBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -301,18 +360,22 @@ public class CopyObjectDialog {
         GridPane.setMargin(s1, new Insets(5, 0, 10, 0));
 
         //check allowed
-        int x = 0;
+        int yAxis = 0;
 
-        gp.add(link, 0, x);
-        gp.add(move, 0, ++x);
+        gp.add(link, 0, yAxis);
+        gp.add(move, 0, ++yAxis);
 
-        gp.add(copy, 0, ++x);
-        gp.add(clone, 0, ++x);
+        gp.add(copy, 0, ++yAxis);
+//        gp.add(clone, 0, ++x);
 
-        gp.add(new Separator(Orientation.VERTICAL), 1, 0, 1, 4);
-        gp.add(s1, 0, ++x, 3, 1);
-        gp.add(nameBox, 0, ++x, 3, 1);
-        gp.add(countBox, 0, ++x, 3, 1);
+        gp.add(new Separator(Orientation.VERTICAL), 1, 0, 1, 3);
+        gp.add(s1, 0, ++yAxis, 3, 1);
+
+        gp.add(recursion, 0, ++yAxis, 3, 1);//new
+        gp.add(includeSamples, 0, ++yAxis, 3, 1);//new
+        gp.add(countBox, 0, ++yAxis, 3, 1);
+        gp.add(new Separator(Orientation.HORIZONTAL), 0, ++yAxis, 3, 1);
+        gp.add(nameBox, 0, ++yAxis, 3, 1);
 
         gp.add(info, 2, 0, 1, 4);
 
@@ -340,9 +403,10 @@ public class CopyObjectDialog {
                     response = Response.LINK;
                 } else if (group.getSelectedToggle().equals(copy)) {
                     response = Response.COPY;
-                } else if (group.getSelectedToggle().equals(clone)) {
-                    response = Response.CLONE;
                 }
+//                else if (group.getSelectedToggle().equals(clone)) {
+//                    response = Response.CLONE;
+//                }
 
             }
         });
@@ -371,11 +435,53 @@ public class CopyObjectDialog {
         return response;
     }
 
+    public boolean isIncludeData() {
+        return includeSamples.isSelected();
+    }
+
     private void checkName() {
         if (nameField.getText() != null && !nameField.getText().isEmpty()) {
             ok.setDisable(false);
         } else {
             ok.setDisable(true);
         }
+    }
+
+    private void showError(String title, String titleLong, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(titleLong);
+        alert.setContentText(message);
+        alert.setResizable(true);
+        alert.show();
+    }
+
+    public boolean parentCheck(JEVisObject obj, JEVisObject target) {
+        try {
+//            System.out.println("parentCheck: " + obj.getName() + " -> " + target.getName());
+            //Check if its the same object
+            if (target.equals(obj)) {
+//                System.out.println("Error 1");
+                return false;
+            }
+
+            //check if the obj its os own parent
+            for (JEVisObject parent : target.getParents()) {
+                if (parent.equals(target)) {
+                    showError("Error", "Recrusion Error", "Recrusion error detected. ");
+                    return false;
+                }
+                if (!parentCheck(obj, parent)) {
+//                    System.out.println("Error 3.2");
+                    return false;
+                }
+
+            }
+
+        } catch (JEVisException ex) {
+            Logger.getLogger(ObjectTree.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return true;
     }
 }
