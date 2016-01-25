@@ -138,7 +138,7 @@ public class CreateTable {
         Button cancelBtn = new Button("Cancel");
 
         //Wenn createclass ein JEconfig "Data" object ist,wird CreateNewDataTable aufgerufen.
-        //Wenn nicht CreateNewTable aufgerufen.
+        //Wenn nicht wird CreateNewTable aufgerufen.
         try {
             if (createClass.getName().equals("Data")) {
                 new CreateNewDataTable(createBtn);
@@ -185,14 +185,14 @@ public class CreateTable {
                     if (!spcObjectName.equals("")) {
                         //Schritt3 : Ab zweiten Spalten fangen wir die Attribute abzulesen.
                         //Die Attribute werden in eine Liste abgespeichert.
-                        ArrayList<String> attributs = new ArrayList<>();
+                        ArrayList<String> attributes = new ArrayList<>();
                         for (int j = 1; j < grid.getColumnCount(); j++) {
                             SpreadsheetCell spcAttribut = rows.get(i).get(j);
-                            attributs.add(spcAttribut.getText());
+                            attributes.add(spcAttribut.getText());
                         }
                         //Schritt4 : Objektname und die Attribute werden in die pairList abgepeichert.
                         //Diese Liste wird in der fireEventCreateTable() Methode von der Klasse ObjectTree.java aufgerufen.                     
-                        pairList.add(new Pair(spcObjectName, attributs));
+                        pairList.add(new Pair(spcObjectName, attributes));
                     }
                 }
                 response = Response.YES;
@@ -231,7 +231,7 @@ public class CreateTable {
                 }
             }
         });
-        
+
         //Help Button für die help Datei.
         help.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -328,7 +328,13 @@ public class CreateTable {
             //Erzeuge eine fixe Tabelle mit dieser Spaltennamen.
             String[] colNames = {"Object Name", "Display Prefix", "Display Symbol", "Display Sample Rate", "Input Prefix", "Input Symbol", "Input Sample Rate"};
             rowCount = 1000;
-            columnCount = colNames.length;
+
+            try {
+                int typeSize = createClass.getTypes().size() - 1;
+                columnCount = colNames.length + typeSize;
+            } catch (JEVisException ex) {
+                Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
             grid = new GridBase(rowCount, columnCount);
 
@@ -353,8 +359,20 @@ public class CreateTable {
 
             spv.setEditable(true);
             spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            columnHeaderNamesDataTable.addAll(colNames);
 
+            try {
+                //Get and set Typenames außer Value attribute
+                for (int i = 0; i < createClass.getTypes().size(); i++) {
+                    if (!createClass.getTypes().get(i).getName().equals("Value")) {
+                        columnHeaderNames.add(createClass.getTypes().get(i).getName());
+                    }
+                }
+            } catch (JEVisException ex) {
+                Logger.getLogger(EditTable.CreateNewEditTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            columnHeaderNamesDataTable.addAll(colNames);
+            columnHeaderNamesDataTable.addAll(columnHeaderNames);
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNamesDataTable);
 
             addUnits();
@@ -534,7 +552,7 @@ public class CreateTable {
 
     // JEVIS Unit symbols
     private void addSymbols() {
-	listUnitSymbols.addAll("m/s\u00B2",
+        listUnitSymbols.addAll("m/s\u00B2",
                 "g", "mol", "atom", "rad", "bit", "\u0025", "centiradian", "dB", "\u00b0", "\u0027", "byte", "rev", "\u00A8", "sphere", "sr", "rad/s\u00B2", "rad/s", "Bq", "Ci", "Hz",
                 "m\u00B2", "a", "ha", "cm\u00B2", "km\u00B2", "kat", "\u20AC", "\u20A6", "\u20B9", "\u0024", "*\u003F*", "\u00A5", "Hits/cm\u00B2", "Hits/m\u00B2", "\u03A9/cm\u00B2", "bit/s", "\u002D", "s", "m", "h", "day", "day_sidereal",
                 "week", "month", "year", "year_calendar", "year_sidereal", "g/\u0028cms\u0029", "F", "C", "e", "Fd", "Fr", "S", "A", "Gi", "H", "V", "\u03A9", "J",

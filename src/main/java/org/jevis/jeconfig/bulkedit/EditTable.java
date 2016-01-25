@@ -90,10 +90,10 @@ public class EditTable {
 
     private void addListChildren(JEVisObject parent, JEVisClass selectedClass) {
         try {
-            
+
             List<JEVisObject> childList = parent.getChildren();
-            for(JEVisObject child : childList){
-                for (int i = 0; i < child.getChildren (selectedClass, false).size(); i++) {
+            for (JEVisObject child : childList) {
+                for (int i = 0; i < child.getChildren(selectedClass, false).size(); i++) {
                     listChildren.add(child.getChildren(selectedClass, false).get(i));
                 }
             }
@@ -333,6 +333,7 @@ public class EditTable {
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNames);
 
             //Add the attributes and the samples in to the listObjectAndSample
+            //TODO Look me!
             try {
                 for (int i = 0; i < grid.getRowCount(); i++) {
                     // Get attributes
@@ -405,10 +406,16 @@ public class EditTable {
         public CreateNewDataEditTable(JEVisObject parent, Button editBtn) {
 
             String[] colNames = {"Object ID", "Object Name", "Display Prefix", "Display Symbol", "Display Sample Rate", "Input Prefix", "Input Symbol", "Input Sample Rate"};
+            try {
+                rowCount = getListChildren().size();
+                //Ziehe "value" attribut ab.
+                int typeSize = selectedClass.getTypes().size() - 1;
+                columnCount = colNames.length + typeSize;
 
-            rowCount = getListChildren().size();
-            columnCount = colNames.length;
-            
+            } catch (JEVisException ex) {
+                Logger.getLogger(EditTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             grid = new GridBase(rowCount, columnCount);
 
             for (int row = 0; row < grid.getRowCount(); ++row) {
@@ -433,8 +440,21 @@ public class EditTable {
 
             spv.setEditable(true);
             spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            columnHeaderNamesDataTable.addAll(colNames);
 
+            //Hier wird spalten für Dataobjekt eingefügt!
+            try {
+                //Get and set Typenames
+                for (int i = 0; i < selectedClass.getTypes().size(); i++) {
+                    if (!selectedClass.getTypes().get(i).getName().equals("Value")) {
+                        columnHeaderNames.add(selectedClass.getTypes().get(i).getName());
+                    }
+                }
+            } catch (JEVisException ex) {
+                Logger.getLogger(CreateNewEditTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            columnHeaderNamesDataTable.addAll(colNames);
+            columnHeaderNamesDataTable.addAll(columnHeaderNames);
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNamesDataTable);
 
             try {
@@ -442,22 +462,22 @@ public class EditTable {
                     // Get attributes
                     List<JEVisAttribute> attributes = listChildren.get(i).getAttributes();
                     ObservableList<Pair<String, String>> listValueAttribute = FXCollections.observableArrayList();
-
+                    //TODO 
+                    //add the other attribute in the list! --> minProcess and maxProcess
+                    // Go to up //TODO Look me!
                     for (int z = 0; z < attributes.size(); z++) {
-
-                        JEVisUnit displayUnit = attributes.get(z).getDisplayUnit();
-                        String[] splitDisplayUnit = attributes.get(z).getDisplayUnit().toJSON().split("\"");
-
-                        String displayPrefix = attributes.get(z).getDisplayUnit().getPrefix().toString();
-                        String displaySampleRate = attributes.get(z).getDisplaySampleRate().toString();
-
-                        JEVisUnit inputUnit = attributes.get(z).getInputUnit();
-                        String[] splitInputUnit = attributes.get(z).getInputUnit().toJSON().split("\"");
-
-                        String inputSampleRate = attributes.get(z).getInputSampleRate().toString();
-                        String inputPrefix = attributes.get(z).getInputUnit().getPrefix().toString();
-
                         if (attributes.get(z).getName().equals("Value")) {
+                            JEVisUnit displayUnit = attributes.get(z).getDisplayUnit();
+                            String[] splitDisplayUnit = attributes.get(z).getDisplayUnit().toJSON().split("\"");
+
+                            String displayPrefix = attributes.get(z).getDisplayUnit().getPrefix().toString();
+                            String displaySampleRate = attributes.get(z).getDisplaySampleRate().toString();
+
+                            JEVisUnit inputUnit = attributes.get(z).getInputUnit();
+                            String[] splitInputUnit = attributes.get(z).getInputUnit().toJSON().split("\"");
+
+                            String inputSampleRate = attributes.get(z).getInputSampleRate().toString();
+                            String inputPrefix = attributes.get(z).getInputUnit().getPrefix().toString();
 
                             if (displayPrefix.equals("") || displayPrefix.equals(null) || displayPrefix.equals("NONE")) {
                                 listValueAttribute.add(new Pair(attributes.get(z).getName(), ""));
@@ -469,7 +489,6 @@ public class EditTable {
                                 listValueAttribute.add(new Pair(attributes.get(z).getName(), ""));
                             } else {
                                 listValueAttribute.add(new Pair(attributes.get(z).getName(), splitDisplayUnit[3]));
-
                             }
 
                             if (displaySampleRate.equals("") || displaySampleRate.equals(null) || displaySampleRate.equals("NONE")) {
@@ -490,6 +509,10 @@ public class EditTable {
                                 listValueAttribute.add(new Pair(attributes.get(z).getName(), splitInputUnit[3]));
                             }
                             listValueAttribute.add(new Pair(attributes.get(z).getName(), inputSampleRate));
+                        } else {
+                            System.out.println(attributes.get(z).getName());
+                            System.out.println(attributes.get(z).getLatestSample().getValueAsString());
+                            listValueAttribute.add(new Pair(attributes.get(z).getName(), attributes.get(z).getLatestSample().getValueAsString()));
                         }
                     }
                     listObjectAndValueAttribute.add(new Pair(listChildren.get(i), listValueAttribute));
@@ -501,7 +524,7 @@ public class EditTable {
             //sortiere die Liste! Die Reihenfolge ist genau wie Baumsreihenfolge
             sortTheChildren(listChildren);
             sortTheAttribute(listObjectAndValueAttribute);
-            
+
             //Add to table
             //Hier wird die Daten von den listChildren und listObjectAndValueAttribute aufgerufen und dann in die Tabelle eingefügt.
             for (int i = 0; i < grid.getRowCount(); i++) {
@@ -520,10 +543,10 @@ public class EditTable {
                             grid.setCellValue(i, counter, listObjectAndValueAttribute.get(i).getValue().get(k).getValue());
                             counter++;
                         }
-                            }
-                            }
-                        }
-                        
+                    }
+                }
+            }
+
             addUnits();
             addSymbols();
             //GridChange Event for Prefix and Symbol Input Control
