@@ -4,7 +4,7 @@
 
     <groupId>org.jevis.jeconfig</groupId>
     <artifactId>JEConfig</artifactId>
-    <version>3.0.15</version>
+    <version>3.0.16</version>
     <packaging>jar</packaging>
 
     <name>JEConfig</name>

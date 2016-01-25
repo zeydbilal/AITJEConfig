@@ -20,8 +20,6 @@
 package org.jevis.jeconfig.plugin.object;
 
 import java.util.ArrayList;
-import org.jevis.jeconfig.bulkedit.CreateTable;
-import org.jevis.jeconfig.bulkedit.EditTable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +53,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
-import javax.measure.unit.Unit;
 import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisConstants;
 import org.jevis.api.JEVisDataSource;
@@ -63,8 +60,6 @@ import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.api.JEVisRelationship;
 import org.jevis.api.JEVisSample;
-import org.jevis.api.JEVisUnit;
-import org.jevis.api.JEVisUnit.Prefix;
 import org.jevis.application.dialog.ConfirmDialog;
 import org.jevis.application.dialog.ExceptionDialog;
 import org.jevis.application.dialog.InfoDialog;

@@ -55,48 +55,6 @@ public class ObjectGraphic {
         _obj = obj;
         _tree = tree;
         update();
-
-//        _menu = new ObjectContextMenu(obj, tree);
-//
-//        icon = getIcon(_obj);
-//        _view.setAlignment(Pos.CENTER_LEFT);
-//        _view.setSpacing(3);
-//        _view.setPadding(new Insets(0, 0, 0, 5));
-//
-//        try {
-//
-//            if (_obj.getJEVisClass() != null) {
-//                if (_obj.getJEVisClass().getName().equals(CommonClasses.LINK.NAME)) {
-//
-//                    if (_obj.getLinkedObject() != null) {
-//                        icon = getIcon(_obj.getLinkedObject());
-//                    } else {
-//                        icon = JEConfig.getImage("1403724422_link_break.png", 20, 20);
-//                    }
-//
-//                }
-//            } else {
-//                icon = JEConfig.getImage("1390343812_folder-open.png", 20, 20);
-//            }
-//
-//        } catch (Exception ex) {
-//            Logger.getLogger(ObjectGraphic.class.getName()).log(Level.SEVERE, null, ex);
-//            icon = JEConfig.getImage("1403724422_link_break.png", 20, 20);
-//        }
-//
-//        try {
-//            String classname = "";
-//            if (obj.getJEVisClass() != null) {
-//                classname = obj.getJEVisClass().getName();
-//            }
-//
-//            _tip = new Tooltip(String.format("ID:       %s\nName: %s\nClass:  %s\n", obj.getID().toString(), obj.getName(), classname));
-//        } catch (JEVisException ex) {
-//            Logger.getLogger(ObjectGraphic.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//
-//        nameLabel.setText(_obj.getName());
-//        _view.getChildren().setAll(icon, nameLabel);
     }
 
     public void update() {

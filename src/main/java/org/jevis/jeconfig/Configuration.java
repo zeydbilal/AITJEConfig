@@ -99,7 +99,7 @@ public class Configuration {
 
     public void parseParameters(Application.Parameters args) {
 
-        System.out.println("Pars config");
+//        System.out.println("Pars config");
         configuration = ParameterHelper.ParseJEVisConfiguration(args);
         for (JEVisOption opt : configuration) {
             if (opt.equals(JECONFIG)) {
@@ -109,9 +109,7 @@ public class Configuration {
         }
 
         if (options != null) {
-            System.out.println("1");
             if (options.hasOption(URL_WELCOME.getKey())) {
-                System.out.println("2");
                 JEVisOption opt = options.getOption(URL_WELCOME.getKey());
                 if (opt.getValue().equals("off")) {
                     _welcomeURL = "";
@@ -125,7 +123,7 @@ public class Configuration {
             _welcomeURL = "http://openjevis.org/";
 
         }
-        System.out.println("Welcome URL: " + _welcomeURL);
+//        System.out.println("Welcome URL: " + _welcomeURL);
 
 //        for (Map.Entry<String, String> entry : args.getNamed().entrySet()) {
 //            System.out.println(entry.getKey() + " : " + entry.getValue());
