@@ -466,6 +466,7 @@ public class EditTable {
                     //add the other attribute in the list! --> minProcess and maxProcess
                     // Go to up //TODO Look me!
                     for (int z = 0; z < attributes.size(); z++) {
+                        //Wenn es Value attribut ist,...
                         if (attributes.get(z).getName().equals("Value")) {
                             JEVisUnit displayUnit = attributes.get(z).getDisplayUnit();
                             String[] splitDisplayUnit = attributes.get(z).getDisplayUnit().toJSON().split("\"");
@@ -510,8 +511,7 @@ public class EditTable {
                             }
                             listValueAttribute.add(new Pair(attributes.get(z).getName(), inputSampleRate));
                         } else {
-                            System.out.println(attributes.get(z).getName());
-                            System.out.println(attributes.get(z).getLatestSample().getValueAsString());
+                             //Wenn es nicht Value attribut ist,...
                             listValueAttribute.add(new Pair(attributes.get(z).getName(), attributes.get(z).getLatestSample().getValueAsString()));
                         }
                     }

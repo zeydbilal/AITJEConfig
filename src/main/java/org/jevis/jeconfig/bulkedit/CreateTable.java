@@ -239,7 +239,7 @@ public class CreateTable {
                 WebBrowser webBrowser = new WebBrowser();
             }
         });
-
+        
         stage.setTitle("Bulk Create");
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(owner);

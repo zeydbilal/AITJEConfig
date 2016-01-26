@@ -120,10 +120,12 @@ public class ManualWizardStep1 extends WizardPane {
             //Create Data Source Directory und Data Directory
             if (allowedChildrenClasses.size() > 0) {
                 for (int i = 0; i < allowedChildrenClasses.size(); i++) {
-                    JEVisObject newChildObject = newTreeItem.getValue().buildObject(allowedChildrenClasses.get(i).getName(), allowedChildrenClasses.get(i));
-                    newChildObject.commit();
+                    JEVisObject newChildObject = null;
                     if (allowedChildrenClasses.get(i).getName().equals("Data Directory")) {
+                        newChildObject = newTreeItem.getValue().buildObject(allowedChildrenClasses.get(i).getName(), allowedChildrenClasses.get(i));
                         wizardSelectedObject.setCurrentDataDirectory(newChildObject);
+                    } else if (allowedChildrenClasses.get(i).getName().equals("Data Source Directory")) {
+                        newChildObject = newTreeItem.getValue().buildObject(allowedChildrenClasses.get(i).getName(), allowedChildrenClasses.get(i));
                     }
                 }
             }

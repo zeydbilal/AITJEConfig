@@ -1,6 +1,7 @@
 package org.jevis.jeconfig.bulkedit;
 
 import java.util.Set;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.Clipboard;
@@ -18,6 +19,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 //kann man die Inputs zu einem Excel-Sheet exportieren oder von einem Excel-Sheet in die Tabelle importieren.
 public class SpreadsheetViewTable extends SpreadsheetView {
 
+    private ObservableList<String> columnHeaderNames = FXCollections.observableArrayList();
     private static final String EXCEL_IDENTIFIER = "Biff8";
     private ObservableList<ObservableList<SpreadsheetCell>> rows;
     private DataFormat fmtExcel;
@@ -50,17 +52,19 @@ public class SpreadsheetViewTable extends SpreadsheetView {
 
     //Kopie den Inhalt zum ClipBoard
     public void copyClipBoardSpecific() {
+        columnHeaderNames = getGrid().getColumnHeaders();
+
         try {
             Clipboard clipboard = Clipboard.getSystemClipboard();
             DataFormat spreadsheetViewFormat = findSpreadsheetViewFormat(clipboard.getContentTypes());
             ClipboardContent content = new ClipboardContent();
 
             ObservableList<TablePosition> focusedCell = this.getSelectionModel().getSelectedCells();
-
+            String allText = "";
             String contentText = "";
+            String colName = "";
 
             int oldRow = -1;
-
             for (final TablePosition<?, ?> p : focusedCell) {
                 int currentRow = p.getRow();
                 int currentColumn = p.getColumn();
@@ -78,14 +82,31 @@ public class SpreadsheetViewTable extends SpreadsheetView {
                 oldRow = currentRow;
 
             }
+            //Für HeaderNames
+            int rowControl = -1;
+            for (final TablePosition<?, ?> p : focusedCell) {
+                int currentRow = p.getRow();
 
-            content.putString(contentText);
+                if (rowControl == currentRow) {
+                    colName += "\t";
+                } else if (rowControl != -1) {
+                    break;
+                }
+
+                String colText = columnHeaderNames.get(p.getColumn());
+                colName += colText;
+
+                rowControl = currentRow;
+            }
+
+            allText = colName + "\n" + contentText;
+            content.putString(allText);
             if (fmtExcel == null) {
                 fmtExcel = DataFormat.PLAIN_TEXT;
             }
             Object templist = Clipboard.getSystemClipboard().getContent(spreadsheetViewFormat);
             content.put(spreadsheetViewFormat, templist);
-            content.put(fmtExcel, contentText);
+            content.put(fmtExcel, allText);
             clipboard.setContent(content);
         } catch (IndexOutOfBoundsException e) {
         }

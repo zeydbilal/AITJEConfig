@@ -598,7 +598,7 @@ public class ObjectTree extends TreeView<JEVisObject> {
                             newObject.commit();
 
                             List<JEVisAttribute> attributes = newObject.getAttributes();
-
+                             //Counter ist für die attribute. Es anfangt ab Spalte "Input Sample Rate" zu zahlen.
                             int counter = 6;
                             for (int j = 0; j < attributes.size(); j++) {
                                 if (attributes.get(j).getName().equals("Value")) {
@@ -700,7 +700,7 @@ public class ObjectTree extends TreeView<JEVisObject> {
                         childObject = table.getListChildren().get(i);
 //                      childObject.commit();
                         List<JEVisAttribute> attributes = childObject.getAttributes();
-
+                        //Counter ist für die attribute. Es anfangt ab Spalte "Input Sample Rate" zu zahlen.
                         int counter = 6;
                         for (int j = 0; j < attributes.size(); j++) {
                             if (attributes.get(j).getName().equals("Value")) {
