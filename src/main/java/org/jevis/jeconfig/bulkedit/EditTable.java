@@ -361,7 +361,7 @@ public class EditTable {
             sortTheChildren(listChildren);
             sortTheAttribute(listObjectAndSample);
             //Add to table
-            //Hier wird die Daten von den listChildren und listObjectAndSample aufgerufen und dann in die Tabelle eingefügt.
+            //Hier wird die Daten von den listChildren und listObjectAndSample aufgerufen und dann in die Tabelle eingefÃ¼gt.
             for (int i = 0; i < grid.getRowCount(); i++) {
                 for (int j = 0; j < grid.getColumnCount(); j++) {
                     if (columnHeaderNames.get(j).equals("Object ID")) {
@@ -441,7 +441,7 @@ public class EditTable {
             spv.setEditable(true);
             spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-            //Hier wird spalten für Dataobjekt eingefügt!
+            //Hier wird spalten fÃ¼r Dataobjekt eingefÃ¼gt!
             try {
                 //Get and set Typenames
                 for (int i = 0; i < selectedClass.getTypes().size(); i++) {
@@ -511,7 +511,7 @@ public class EditTable {
                             }
                             listValueAttribute.add(new Pair(attributes.get(z).getName(), inputSampleRate));
                         } else {
-                             //Wenn es nicht Value attribut ist,...
+                            //Wenn es nicht Value attribut ist,...
                             listValueAttribute.add(new Pair(attributes.get(z).getName(), attributes.get(z).getLatestSample().getValueAsString()));
                         }
                     }
@@ -526,7 +526,7 @@ public class EditTable {
             sortTheAttribute(listObjectAndValueAttribute);
 
             //Add to table
-            //Hier wird die Daten von den listChildren und listObjectAndValueAttribute aufgerufen und dann in die Tabelle eingefügt.
+            //Hier wird die Daten von den listChildren und listObjectAndValueAttribute aufgerufen und dann in die Tabelle eingefÃ¼gt.
             for (int i = 0; i < grid.getRowCount(); i++) {
                 for (int j = 0; j < grid.getColumnCount(); j++) {
                     if (columnHeaderNamesDataTable.get(j).equals("Object ID")) {
@@ -701,7 +701,7 @@ public class EditTable {
         listSampleRateControl.clear();
     }
 
-    // Hier wird die Zellenhöhe anpasst
+    // Hier wird die ZellenhÃ¶he anpasst
     private Map<Integer, Double> generateRowHeight() {
         Map<Integer, Double> rowHeight = new HashMap<>();
         for (int i = 0; i < grid.getRowCount(); i++) {

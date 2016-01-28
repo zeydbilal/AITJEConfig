@@ -3,6 +3,8 @@ package org.jevis.jeconfig.bulkedit;
 import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -47,7 +49,6 @@ public class SpreadsheetViewTable extends SpreadsheetView {
         } else {
             pasteClipBoardSpecific();
         }
-
     }
 
     //Kopie den Inhalt zum ClipBoard
@@ -76,13 +77,12 @@ public class SpreadsheetViewTable extends SpreadsheetView {
                 }
 
                 String spcText = rows.get(currentRow).get(currentColumn).getText();
-
                 contentText += spcText;
 
                 oldRow = currentRow;
 
             }
-            //Für HeaderNames
+            //Copy HeaderNames mit
             int rowControl = -1;
             for (final TablePosition<?, ?> p : focusedCell) {
                 int currentRow = p.getRow();
@@ -114,6 +114,8 @@ public class SpreadsheetViewTable extends SpreadsheetView {
 
     //Paste den Inhalt vom ClipBoard
     public void pasteClipBoardSpecific() {
+        columnHeaderNames = getGrid().getColumnHeaders();
+
         try {
             Clipboard clipboard = Clipboard.getSystemClipboard();
             String[] words = clipboard.getString().split("\n");
@@ -127,16 +129,42 @@ public class SpreadsheetViewTable extends SpreadsheetView {
                 currentColumn = p.getColumn();
             }
 
-            for (String word : words) {
-                String[] parseWord = word.split("\t");
-                int col = currentColumn;
-                for (int i = 0; i < parseWord.length; i++) {
-                    SpreadsheetCell spc = rows.get(currentRow).get(col);
-                    grid.setCellValue(currentRow, col, spc.getCellType().convertValue(parseWord[i].trim()));
+            //Check ObjektID's 
+            //Ob sie gleich sind oder nicht!
+            if (currentColumn == 0 && columnHeaderNames.get(0).equals("Object ID")) {
+                for (String word : words) {
+                    String[] parseWord = word.split("\t");
+                    if (!rows.get(currentRow).get(0).getText().equals(parseWord[0])) {
+                        Alert alert = new Alert(AlertType.ERROR);
+                        alert.setTitle("Error Dialog");
+                        alert.setHeaderText("Matching Error : Incorrect object ID !");
+                        alert.setContentText("Please check your object ID for row " + (currentRow + 1) + " !");
 
-                    col++;
+                        alert.showAndWait();
+                        return;
+                    }
+                    int col = currentColumn;
+                    for (int i = 0; i < parseWord.length; i++) {
+                        SpreadsheetCell spc = rows.get(currentRow).get(col);
+                        grid.setCellValue(currentRow, col, spc.getCellType().convertValue(parseWord[i].trim()));
+
+                        col++;
+                    }
+                    currentRow++;
                 }
-                currentRow++;
+            } else {
+                //Wenn in der Tabelle kein ObjektID gibt,wird das ausgeführt!
+                for (String word : words) {
+                    String[] parseWord = word.split("\t");
+                    int col = currentColumn;
+                    for (int i = 0; i < parseWord.length; i++) {
+                        SpreadsheetCell spc = rows.get(currentRow).get(col);
+                        grid.setCellValue(currentRow, col, spc.getCellType().convertValue(parseWord[i].trim()));
+
+                        col++;
+                    }
+                    currentRow++;
+                }
             }
         } catch (IndexOutOfBoundsException e) {
         }
