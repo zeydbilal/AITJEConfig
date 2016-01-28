@@ -138,7 +138,7 @@ public class SpreadsheetViewTable extends SpreadsheetView {
                         Alert alert = new Alert(AlertType.ERROR);
                         alert.setTitle("Error Dialog");
                         alert.setHeaderText("Matching Error : Incorrect object ID !");
-                        alert.setContentText("Please check your object ID for row " + (currentRow + 1) + " !");
+                        alert.setContentText("Please check your object ID on row " + (currentRow + 1) + " !");
 
                         alert.showAndWait();
                         return;
