@@ -241,15 +241,26 @@ public class EditTable {
 
             @Override
             public void handle(ActionEvent event) {
-                rows.clear();
-                columnHeaderNames.clear();
-                columnHeaderNamesDataTable.clear();
-                pairList.clear();
-                listChildren.clear();
-                selectedClass = classComboBox.getSelectionModel().getSelectedItem();
-                addListChildren(parent, selectedClass);
-                new CreateNewEditTable(parent);
-                root.setCenter(spv);
+                try {
+                    rows.clear();
+                    columnHeaderNames.clear();
+                    columnHeaderNamesDataTable.clear();
+                    pairList.clear();
+                    listChildren.clear();
+                    selectedClass = classComboBox.getSelectionModel().getSelectedItem();
+                    addListChildren(parent, selectedClass);
+
+                    if (selectedClass.getName().equals("Data")) {
+                        //TODO
+                        new CreateNewDataEditTable(parent, editBtn);
+                        root.setCenter(spv);
+                    } else {
+                        new CreateNewEditTable(parent);
+                        root.setCenter(spv);
+                    }
+                } catch (JEVisException ex) {
+                    Logger.getLogger(EditTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
 
@@ -442,7 +453,7 @@ public class EditTable {
             spv.setEditable(true);
             spv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-            //Hier wird spalten fÃ¼r Dataobjekt eingefÃ¼gt!
+            //Hier wird spalten fuer Dataobjekt eingefuegt!
             try {
                 //Get and set Typenames
                 for (int i = 0; i < selectedClass.getTypes().size(); i++) {
