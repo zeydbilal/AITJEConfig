@@ -69,6 +69,7 @@ public class EditTable {
     private int columnCount;
     private ObservableList<String> columnHeaderNames = FXCollections.observableArrayList();
     private ObservableList<String> columnHeaderNamesDataTable = FXCollections.observableArrayList();
+    //Liste für die Objekte und ihre Attribute
     private ObservableList<Pair<String, ArrayList<String>>> pairList = FXCollections.observableArrayList();
     private ObservableList<String> listUnits = FXCollections.observableArrayList();
     private ObservableList<String> listUnitSymbols = FXCollections.observableArrayList();
@@ -361,7 +362,7 @@ public class EditTable {
             sortTheChildren(listChildren);
             sortTheAttribute(listObjectAndSample);
             //Add to table
-            //Hier wird die Daten von den listChildren und listObjectAndSample aufgerufen und dann in die Tabelle eingefÃ¼gt.
+            //Hier wird die Daten von den listChildren und listObjectAndSample aufgerufen und dann in die Tabelle eingefuegt.
             for (int i = 0; i < grid.getRowCount(); i++) {
                 for (int j = 0; j < grid.getColumnCount(); j++) {
                     if (columnHeaderNames.get(j).equals("Object ID")) {
@@ -512,7 +513,13 @@ public class EditTable {
                             listValueAttribute.add(new Pair(attributes.get(z).getName(), inputSampleRate));
                         } else {
                             //Wenn es nicht Value attribut ist,...
-                            listValueAttribute.add(new Pair(attributes.get(z).getName(), attributes.get(z).getLatestSample().getValueAsString()));
+                            if (attributes.get(z).getLatestSample() != null) {
+                                //Get the last sample for this attribute
+                                // Add the last attribute name und value in the list.
+                                listValueAttribute.add(new Pair(attributes.get(z).getName(), attributes.get(z).getLatestSample().getValueAsString()));
+                            } else {
+                                listValueAttribute.add(new Pair(attributes.get(z).getName(), ""));
+                            }
                         }
                     }
                     listObjectAndValueAttribute.add(new Pair(listChildren.get(i), listValueAttribute));

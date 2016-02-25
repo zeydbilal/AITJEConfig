@@ -75,6 +75,7 @@ public class AutomatedWizardStep1 extends WizardPane {
     // global Object variable
     private WizardSelectedObject wizardSelectedObject;
     Button test;
+
     /**
      *
      * @param parentObject Has to be 'Monitored Object Directory' node
@@ -99,9 +100,9 @@ public class AutomatedWizardStep1 extends WizardPane {
 
         BorderPane root = new BorderPane();
         GridPane gridpane = new GridPane();
-        
-         Label descriptionLbl = new Label("Select the Building to create the Structure");
-         
+
+        Label descriptionLbl = new Label("Select the JEVis Building Node to create the Structure");
+
         Label newBuildingLbl = new Label("New Building Name");
 
         ObservableList<JEVisObject> options = FXCollections.observableArrayList();
@@ -163,16 +164,16 @@ public class AutomatedWizardStep1 extends WizardPane {
         classComboBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
-                newBuildingTxtf.setText(classComboBox.getSelectionModel().getSelectedItem().getName());            }
+                newBuildingTxtf.setText(classComboBox.getSelectionModel().getSelectedItem().getName());
+            }
         });
-        
+
         classComboBox.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 newBuildingTxtf.setText(classComboBox.getSelectionModel().getSelectedItem().getName());
             }
         });
-        
 
         gridpane.setHgap(10);//horizontal gap in pixels 
         gridpane.setVgap(10);//vertical gap in pixels
@@ -188,18 +189,18 @@ public class AutomatedWizardStep1 extends WizardPane {
         root.setTop(gridpane);
         return root;
     }
-    
+
     @Override
     public void onEnteringPage(Wizard wizard) {
 
         //Hides the 'Back' button
         ObservableList<ButtonType> list = getButtonTypes();
-        
+
         for (ButtonType type : list) {
             if (type.getButtonData().equals(ButtonBar.ButtonData.BACK_PREVIOUS)) {
                 Node prev = lookupButton(type);
                 prev.visibleProperty().setValue(Boolean.FALSE);
-                
+
             }
         }
     }
@@ -211,12 +212,10 @@ public class AutomatedWizardStep1 extends WizardPane {
      */
     @Override
     public void onExitingPage(Wizard wizard) {
-        
-        
+
         JEVisClass buildingClass = null;
         List<JEVisClass> listClasses = null;
-        
-       
+
         try {
             // Get the all allowed classes from selected parent
             listClasses = getParentObject().getAllowedChildrenClasses();
