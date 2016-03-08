@@ -63,8 +63,11 @@ public class CreateTable {
     private int columnCount;
     private ObservableList<String> columnHeaderNames = FXCollections.observableArrayList();
     private ObservableList<String> columnHeaderNamesDataTable = FXCollections.observableArrayList();
+    //Pair list ist fuer die Objektnamen und Attribute
     private ObservableList<Pair<String, ArrayList<String>>> pairList = FXCollections.observableArrayList();
+    //Die Units kommen aus JEVisUnit.Prefix.values
     private ObservableList<String> listUnits = FXCollections.observableArrayList();
+    //Die Unitsymbols kommen aus der addSymbols()
     private ObservableList<String> listUnitSymbols = FXCollections.observableArrayList();
 
     public static enum Type {
@@ -125,7 +128,7 @@ public class CreateTable {
             }
         };
 
-        //ComboBox ist fuer die Kinder vom ausgewählten Parent zu zeigen.
+        //ComboBox ist fuer die Kinder vom ausgewaehlten Parent zu zeigen.
         ComboBox<JEVisClass> classComboBox = new ComboBox<JEVisClass>(options);
         classComboBox.setCellFactory(cellFactory);
         classComboBox.setButtonCell(cellFactory.call(null));

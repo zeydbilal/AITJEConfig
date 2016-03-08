@@ -71,7 +71,9 @@ public class EditTable {
     private ObservableList<String> columnHeaderNamesDataTable = FXCollections.observableArrayList();
     //Liste für die Objekte und ihre Attribute
     private ObservableList<Pair<String, ArrayList<String>>> pairList = FXCollections.observableArrayList();
+    //Die Units kommen aus JEVisUnit.Prefix.values
     private ObservableList<String> listUnits = FXCollections.observableArrayList();
+    //Die Unitsymbols kommen aus der addSymbols()
     private ObservableList<String> listUnitSymbols = FXCollections.observableArrayList();
     private ObservableList<JEVisObject> listChildren = FXCollections.observableArrayList();
 
@@ -251,7 +253,6 @@ public class EditTable {
                     addListChildren(parent, selectedClass);
 
                     if (selectedClass.getName().equals("Data")) {
-                        //TODO
                         new CreateNewDataEditTable(parent, editBtn);
                         root.setCenter(spv);
                     } else {
@@ -345,7 +346,6 @@ public class EditTable {
             spv.getGrid().getColumnHeaders().addAll(columnHeaderNames);
 
             //Add the attributes and the samples in to the listObjectAndSample
-            //TODO Look me!
             try {
                 for (int i = 0; i < grid.getRowCount(); i++) {
                     // Get attributes
@@ -413,7 +413,7 @@ public class EditTable {
     // Diese Klasse spezial nur fuer das Data-Object implementiert.
     class CreateNewDataEditTable {
 
-        private ObservableList<Pair<JEVisObject, ObservableList<Pair<String, String>>>> listObjectAndValueAttribute = FXCollections.observableArrayList();
+        private ObservableList<Pair<JEVisObject, ObservableList<Pair<String, String>>>> listObjectAndAttribute = FXCollections.observableArrayList();
 
         public CreateNewDataEditTable(JEVisObject parent, Button editBtn) {
 
@@ -473,10 +473,9 @@ public class EditTable {
                 for (int i = 0; i < grid.getRowCount(); i++) {
                     // Get attributes
                     List<JEVisAttribute> attributes = listChildren.get(i).getAttributes();
-                    ObservableList<Pair<String, String>> listValueAttribute = FXCollections.observableArrayList();
-                    //TODO 
+                    ObservableList<Pair<String, String>> listAttribute = FXCollections.observableArrayList();
+
                     //add the other attribute in the list! --> minProcess and maxProcess
-                    // Go to up //TODO Look me!
                     for (int z = 0; z < attributes.size(); z++) {
                         //Wenn es Value attribut ist,...
                         if (attributes.get(z).getName().equals("Value")) {
@@ -493,47 +492,50 @@ public class EditTable {
                             String inputPrefix = attributes.get(z).getInputUnit().getPrefix().toString();
 
                             if (displayPrefix.equals("") || displayPrefix.equals(null) || displayPrefix.equals("NONE")) {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), ""));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), ""));
                             } else {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), displayPrefix));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), displayPrefix));
                             }
 
                             if (displayUnit.toString().equals("") || displayUnit.equals(null) || displayUnit.toString().equals("NONE")) {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), ""));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), ""));
                             } else {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), splitDisplayUnit[3]));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), splitDisplayUnit[3]));
                             }
 
                             if (displaySampleRate.equals("") || displaySampleRate.equals(null) || displaySampleRate.equals("NONE")) {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), ""));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), ""));
                             } else {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), displaySampleRate));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), displaySampleRate));
                             }
 
                             if (inputPrefix.equals("") || inputPrefix.equals(null) || inputPrefix.equals("NONE")) {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), ""));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), ""));
                             } else {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), inputPrefix));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), inputPrefix));
                             }
 
                             if (inputUnit.toString().equals("") || inputUnit.equals(null) || inputUnit.toString().equals("NONE")) {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), ""));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), ""));
                             } else {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), splitInputUnit[3]));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), splitInputUnit[3]));
                             }
-                            listValueAttribute.add(new Pair(attributes.get(z).getName(), inputSampleRate));
-                        } else {
-                            //Wenn es nicht Value attribut ist,...
+                            listAttribute.add(new Pair(attributes.get(z).getName(), inputSampleRate));
+                        }
+                    }
+                    //Wenn es nicht Value attribut ist,...
+                    for (int z = 0; z < attributes.size(); z++) {
+                        if (!attributes.get(z).getName().equals("Value")) {
                             if (attributes.get(z).getLatestSample() != null) {
                                 //Get the last sample for this attribute
                                 // Add the last attribute name und value in the list.
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), attributes.get(z).getLatestSample().getValueAsString()));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), attributes.get(z).getLatestSample().getValueAsString()));
                             } else {
-                                listValueAttribute.add(new Pair(attributes.get(z).getName(), ""));
+                                listAttribute.add(new Pair(attributes.get(z).getName(), ""));
                             }
                         }
                     }
-                    listObjectAndValueAttribute.add(new Pair(listChildren.get(i), listValueAttribute));
+                    listObjectAndAttribute.add(new Pair(listChildren.get(i), listAttribute));
                 }
             } catch (JEVisException ex) {
                 Logger.getLogger(EditTable.class.getName()).log(Level.SEVERE, null, ex);
@@ -541,7 +543,7 @@ public class EditTable {
 
             //sortiere die Liste! Die Reihenfolge ist genau wie Baumsreihenfolge
             sortTheChildren(listChildren);
-            sortTheAttribute(listObjectAndValueAttribute);
+            sortTheAttribute(listObjectAndAttribute);
 
             //Add to table
             //Hier wird die Daten von den listChildren und listObjectAndValueAttribute aufgerufen und dann in die Tabelle eingefÃ¼gt.
@@ -557,8 +559,8 @@ public class EditTable {
                     } else {
                         //Attribute ab zweite spalte einsetzen!
                         int counter = 2;
-                        for (int k = 0; k < listObjectAndValueAttribute.get(i).getValue().size(); k++) {
-                            grid.setCellValue(i, counter, listObjectAndValueAttribute.get(i).getValue().get(k).getValue());
+                        for (int k = 0; k < listObjectAndAttribute.get(i).getValue().size(); k++) {
+                            grid.setCellValue(i, counter, listObjectAndAttribute.get(i).getValue().get(k).getValue());
                             counter++;
                         }
                     }
@@ -578,7 +580,7 @@ public class EditTable {
         }
     }
 
-    public void inputControl(Button createBtn) {
+    public void inputControl(Button editBtn) {
         ObservableList<String> listPrefix = FXCollections.observableArrayList();
         ObservableList<String> listSymbols = FXCollections.observableArrayList();
         ObservableList<String> listSampleRateControl = FXCollections.observableArrayList();
@@ -630,9 +632,9 @@ public class EditTable {
         }
 
         if (listUnits.containsAll(listPrefix) && listUnitSymbols.containsAll(listSymbols) && listSampleRateControl.isEmpty()) {
-            createBtn.setDisable(false);
+            editBtn.setDisable(false);
         } else {
-            createBtn.setDisable(true);
+            editBtn.setDisable(true);
         }
 
         for (int i = 0; i < grid.getRowCount(); i++) {
