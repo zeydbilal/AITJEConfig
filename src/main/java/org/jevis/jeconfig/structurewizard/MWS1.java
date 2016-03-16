@@ -28,14 +28,14 @@ import org.jevis.jeconfig.plugin.object.ObjectTree;
  *
  * @author Zeyd Bilal Calis
  */
-public class ManualWizardStep1 extends WizardPane {
+public class MWS1 extends WizardPane {
 
     private JEVisObject parentObject;
     private TextField nameTextField;
     private ObjectTree tree;
     private WizardSelectedObject wizardSelectedObject;
 
-    public ManualWizardStep1(JEVisObject parentObject, ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
+    public MWS1(JEVisObject parentObject, ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
         this.wizardSelectedObject = wizardSelectedObject;
         this.tree = tree;
         setParentObject(parentObject);
@@ -57,7 +57,7 @@ public class ManualWizardStep1 extends WizardPane {
         hbox.getChildren().addAll(namelbl, nameTextField);
         hbox.setPadding(new Insets(200, 10, 10, 20));
 
-        nameTextField.setPromptText("Building here");
+        nameTextField.setPromptText("Building Name");
 
         return hbox;
     }
@@ -143,7 +143,7 @@ public class ManualWizardStep1 extends WizardPane {
             }
 
         } catch (JEVisException ex) {
-            Logger.getLogger(ManualWizardStep1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MWS1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

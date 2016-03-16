@@ -5,6 +5,8 @@
  */
 package org.jevis.jeconfig.structurewizard;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.jevis.api.JEVisObject;
 
 /**
@@ -15,14 +17,14 @@ import org.jevis.api.JEVisObject;
 //Die ausgewaehlte Objekte werden in dieser Klasse abgespeichert bzw. gelagert.
 public class WizardSelectedObject {
 
+    private ObservableList<JEVisObject> currentTemplateObjects = FXCollections.observableArrayList();
+
     // Selected objects from tree
     private JEVisObject currentSelectedObject;
     private JEVisObject currentSelectedBuildingObject;
     private JEVisObject currentDataDirectory;
     private JEVisObject currentDataPointDirectory;
 
-      
-            
     public WizardSelectedObject() {
     }
 
@@ -56,5 +58,13 @@ public class WizardSelectedObject {
 
     public void setCurrentDataPointDirectory(JEVisObject currentDataPointDirectory) {
         this.currentDataPointDirectory = currentDataPointDirectory;
+    }
+
+    public ObservableList<JEVisObject> getCurrentTemplateObjects() {
+        return currentTemplateObjects;
+    }
+
+    public void setCurrentTemplateObjects(JEVisObject jEVisObject) {
+        this.currentTemplateObjects.add(jEVisObject);
     }
 }

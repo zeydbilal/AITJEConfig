@@ -44,7 +44,7 @@ import org.joda.time.DateTime;
  *
  * @author Bilal
  */
-public class ManualWizardStep4 extends WizardPane {
+public class ManualWizardStepLast extends WizardPane {
 
     private final ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
     private ObservableList<SpreadsheetCell> cells;
@@ -60,7 +60,7 @@ public class ManualWizardStep4 extends WizardPane {
     private ObservableList<String> listUnits = FXCollections.observableArrayList();
     private ObservableList<String> listUnitSymbols = FXCollections.observableArrayList();
 
-    public ManualWizardStep4(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
+    public ManualWizardStepLast(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
         this.wizardSelectedObject = wizardSelectedObject;
         this.tree = tree;
         setMinSize(700, 830);
@@ -125,6 +125,7 @@ public class ManualWizardStep4 extends WizardPane {
 
                             //Lies alles von der pairList ab und erzeuge die Objekte.
                             for (Pair<String, ArrayList<String>> pair : pairList) {
+                                //Parent ist DataDirectory.
                                 //Commit Data Object
                                 JEVisObject newDataObject = wizardSelectedObject.getCurrentDataDirectory().buildObject(pair.getKey(), dataClass);
                                 newDataObject.commit();
@@ -157,7 +158,7 @@ public class ManualWizardStep4 extends WizardPane {
                                 }
 
                                 attributeValue.commit();
-
+                                //Parent ist DataPointDirectory
                                 //Commit Data Point Object
                                 JEVisObject newDataPointObject = wizardSelectedObject.getCurrentDataPointDirectory().buildObject(pair.getKey(), dataPointClass);
                                 newDataPointObject.commit();

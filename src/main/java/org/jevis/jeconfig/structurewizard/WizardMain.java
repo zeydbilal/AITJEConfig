@@ -5,9 +5,10 @@
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation in version 3.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
@@ -17,16 +18,7 @@
  */
 package org.jevis.jeconfig.structurewizard;
 
-import org.jevis.jeconfig.structurewizard.ManualWizardStep3;
-import org.jevis.jeconfig.structurewizard.ManualWizardStep2;
-import org.jevis.jeconfig.structurewizard.AutomatedWizardStep1;
-import org.jevis.jeconfig.structurewizard.ManualWizardStep4;
-import org.jevis.jeconfig.structurewizard.ManualWizardStep1;
-//import org.jevis.jeconfig.structurewizard.AutomatedWizardStep2;
-import org.jevis.jeconfig.structurewizard.WizardStartPane;
 import java.util.Optional;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.jevis.api.JEVisObject;
@@ -45,10 +37,14 @@ public class WizardMain extends Wizard {
     private WizardSelectedObject wizardSelectedObject = new WizardSelectedObject();
 
     //Manual Steps
-    private ManualWizardStep1 manualStep1;
-    private ManualWizardStep2 manualStep2;
-    private ManualWizardStep3 manualStep3;
-    private ManualWizardStep4 manualStep4;
+    private MWS1 manualStep1;
+    private MWS2 manualStep2;
+    private MWS3 manualStep3;
+    private MWS4 manualStep4;
+    private MWS5 manualStep5;
+    private MWS6 manualStep6;
+
+    private ManualWizardStepLast manualStepLast; //Tabelle
 
     //Automated Steps
     private AutomatedWizardStep1 automatedWizardStep1;
@@ -59,10 +55,15 @@ public class WizardMain extends Wizard {
         this.tree = tree;
 
         wizardStartPane = new WizardStartPane();
-        manualStep1 = new ManualWizardStep1(parentObject, tree, wizardSelectedObject);
-        manualStep2 = new ManualWizardStep2(tree, wizardSelectedObject);
-        manualStep3 = new ManualWizardStep3(tree, wizardSelectedObject);
-        manualStep4 = new ManualWizardStep4(tree, wizardSelectedObject);
+
+        manualStep1 = new MWS1(parentObject, tree, wizardSelectedObject);
+        manualStep2 = new MWS2(tree, wizardSelectedObject);
+        manualStep3 = new MWS3(tree, wizardSelectedObject);
+        manualStep4 = new MWS4(tree, wizardSelectedObject);
+        manualStep5 = new MWS5(tree, wizardSelectedObject);
+        manualStep6 = new MWS6(tree, wizardSelectedObject);
+
+        manualStepLast = new ManualWizardStepLast(tree, wizardSelectedObject);
 
         automatedWizardStep1 = new AutomatedWizardStep1(parentObject, tree, wizardSelectedObject);
         automatedWizardStep2 = new AutomatedWizardStep2(tree, wizardSelectedObject);
@@ -82,7 +83,7 @@ public class WizardMain extends Wizard {
 
             @Override
             public boolean canAdvance(WizardPane currentPage) {
-                return currentPage != manualStep4 && currentPage != automatedWizardStep2;
+                return currentPage != manualStepLast && currentPage != automatedWizardStep2;
             }
 
             private WizardPane getNext(WizardPane currentPage) {
@@ -95,14 +96,24 @@ public class WizardMain extends Wizard {
                     // On the page ManualWizardStep2
                     return manualStep2;
                 } else if (currentPage.equals(manualStep2)) {
+                    // On the page ManualWizardStep3
                     return manualStep3;
                 } else if (currentPage.equals(manualStep3)) {
+                    // On the page ManualWizardStep4
                     return manualStep4;
+                } else if (currentPage.equals(manualStep4)) {
+                    // On the page ManualWizardStep5
+                    return manualStep5;
+                } else if (currentPage.equals(manualStep5)) {
+                    // On the page ManualWizardStep6
+                    return manualStep6;
+                } else if (currentPage.equals(manualStep6)) {
+                    return manualStepLast;
                 } else if (currentPage.equals(wizardStartPane) && wizardStartPane.getControl().equals("Automated Wiotech Structure Creation")) {
                     return automatedWizardStep1;
                 } else if (currentPage.equals(automatedWizardStep1)) {
-                       return automatedWizardStep2;
-                    } else {
+                    return automatedWizardStep2;
+                } else {
                     return null;
                 }
             }

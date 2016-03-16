@@ -38,6 +38,7 @@ import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisClass;
+import org.jevis.api.JEVisClassRelationship;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.jeconfig.bulkedit.CreateTable;
@@ -190,7 +191,17 @@ public class ManualWizardStep2 extends WizardPane {
         classComboBox.setMinWidth(250);
         classComboBox.getSelectionModel().selectFirst();
         createClass = classComboBox.getSelectionModel().getSelectedItem();
-
+        //TODO
+        //FIXME check the structure !
+        /*
+         if(childrenList.size()==0){
+         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+         alert.setTitle("Information Dialog");
+         alert.setHeaderText(null);
+         alert.setContentText("You can not use this server ! \\n Please check your structure!");
+         alert.showAndWait();
+         }
+         */
         classComboBox.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -198,6 +209,29 @@ public class ManualWizardStep2 extends WizardPane {
                 map.clear();
                 listBuildSample.clear();
                 createClass = classComboBox.getSelectionModel().getSelectedItem();
+                //TODO
+                //FIXME check the structure !
+                // Get the relations
+//                try {
+//                    List<JEVisClassRelationship> list = createClass.getRelationships();
+//                    for (JEVisClassRelationship list1 : list) {
+//                        System.out.println("--> " + createClass.getName());
+//                        for (int i = 0; i < list1.getJEVisClasses().length; i++) {
+//                            System.out.println(list1.getJEVisClasses()[i].getName());
+//                        }
+//                    }
+//                    /*
+//                     if(childrenList.size()==0){
+//                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//                     alert.setTitle("Information Dialog");
+//                     alert.setHeaderText(null);
+//                     alert.setContentText("You can not use this server ! \\n Please check your structure!");
+//                     alert.showAndWait();
+//                     }
+//                     */
+//                } catch (JEVisException ex) {
+//                    Logger.getLogger(ManualWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
+//                }
                 try {
                     for (int i = 0; i < createClass.getTypes().size(); i++) {
                         typeNames.add(createClass.getTypes().get(i).getName());
@@ -205,7 +239,6 @@ public class ManualWizardStep2 extends WizardPane {
                 } catch (JEVisException ex) {
                     Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
                 root.setCenter(getTypes());
             }
         });

@@ -42,6 +42,8 @@ import org.joda.time.DateTime;
  *
  * @author Zeyd Bilal Calis
  */
+
+ //In dieser Klasse wird CSV Parser und Data Point Directory erzeugt.
 public class ManualWizardStep3 extends WizardPane {
 
     private WizardSelectedObject wizardSelectedObject;
