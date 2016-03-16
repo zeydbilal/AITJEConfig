@@ -110,15 +110,15 @@ public class ManualWizardStepLast extends WizardPane {
                             //Get the all children from created DataDirectory und DataPointDirectory.
                             listDataDirectoryClasses = wizardSelectedObject.getCurrentDataDirectory().getAllowedChildrenClasses();
                             listDataPointClasses = wizardSelectedObject.getCurrentDataPointDirectory().getAllowedChildrenClasses();
-                            
+
                             for (JEVisClass classElement : listDataDirectoryClasses) {
-                                if (classElement.getName().equals("Data")) {
+                                if (classElement.getName().endsWith("Data")) {
                                     dataClass = classElement;
                                 }
                             }
 
                             for (JEVisClass classElement : listDataPointClasses) {
-                                if (classElement.getName().equals("Data Point")) {
+                                if (classElement.getName().endsWith("Data Point")) {
                                     dataPointClass = classElement;
                                 }
                             }
@@ -166,9 +166,10 @@ public class ManualWizardStepLast extends WizardPane {
                                 // Create the samples  for the Target and Value Identifier attribute.
                                 JEVisAttribute attributeTarget = newDataPointObject.getAttribute("Target");
                                 attributeTarget.buildSample(new DateTime(), newDataObject.getID()).commit();
-
-                                JEVisAttribute attributeValueIdentifier = newDataPointObject.getAttribute("Value Identifier");
-                                attributeValueIdentifier.buildSample(new DateTime(), pair.getValue().get(2)).commit();
+                                
+                                //Value Identifier attribut wurde gelöscht! Value Identifier--> Objectname zb. Data001
+//                              JEVisAttribute attributeValueIdentifier = newDataPointObject.getAttribute("Value Identifier");
+//                              attributeValueIdentifier.buildSample(new DateTime(), pair.getValue().get(2)).commit();
 
                             }
                         } catch (JEVisException ex) {

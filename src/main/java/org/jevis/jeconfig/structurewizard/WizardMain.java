@@ -44,7 +44,7 @@ public class WizardMain extends Wizard {
     private MWS5 manualStep5;
     private MWS6 manualStep6;
 
-    private ManualWizardStepLast manualStepLast; //Tabelle
+    private ManualWizardStepLast manualStepLast; //Da haben wir die Tabelle
 
     //Automated Steps
     private AutomatedWizardStep1 automatedWizardStep1;

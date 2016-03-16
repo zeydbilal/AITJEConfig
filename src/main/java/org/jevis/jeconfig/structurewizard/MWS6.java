@@ -71,9 +71,17 @@ public class MWS6 extends WizardPane {
     @Override
     public void onExitingPage(Wizard wizard) {
         //Erzeuge das Objekt
+        //Set new Data Point Directory!
         commitObject();
         for (int i = 0; i < wizardSelectedObject.getCurrentTemplateObjects().size(); i++) {
-            System.out.println(wizardSelectedObject.getCurrentTemplateObjects().get(i).getClass().getName());
+            try {
+                System.out.println(wizardSelectedObject.getCurrentTemplateObjects().get(i).getJEVisClass().getName());
+                if (wizardSelectedObject.getCurrentTemplateObjects().get(i).getJEVisClass().getName().endsWith("Data Point Directory")) {
+                    wizardSelectedObject.setCurrentDataPointDirectory(wizardSelectedObject.getCurrentTemplateObjects().get(i));
+                }
+            } catch (JEVisException ex) {
+                Logger.getLogger(MWS6.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -89,16 +97,15 @@ public class MWS6 extends WizardPane {
             wizardSelectedObject.setCurrentTemplateObjects(newObject);
 
             //Check ob das neue Objekt Kind hat oder nicht.
-            if (newObject.getAllowedChildrenClasses().isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Information Dialog");
-                alert.setHeaderText(null);
-                alert.setContentText(createClass.getName() + " has no children! \n"
-                        + ""
-                        + "Please check your structure!");
-                alert.showAndWait();
-            }
-
+//            if (newObject.getAllowedChildrenClasses().isEmpty()) {
+//                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//                alert.setTitle("Information Dialog");
+//                alert.setHeaderText(null);
+//                alert.setContentText(createClass.getName() + " has no children! \n"
+//                        + ""
+//                        + "Please check your structure!");
+//                alert.showAndWait();
+//            }
         } catch (JEVisException ex) {
             Logger.getLogger(MWS6.class.getName()).log(Level.SEVERE, null, ex);
         }
