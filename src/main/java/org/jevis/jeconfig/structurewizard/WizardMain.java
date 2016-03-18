@@ -37,14 +37,15 @@ public class WizardMain extends Wizard {
     private WizardSelectedObject wizardSelectedObject = new WizardSelectedObject();
 
     //Manual Steps
-    private MWS1 manualStep1;
-    private MWS2 manualStep2;
-    private MWS3 manualStep3;
-    private MWS4 manualStep4;
-    private MWS5 manualStep5;
-    private MWS6 manualStep6;
+    private ManualWizardStep1 manualStep1;
+    private ManualWizardStep2 manualStep2;
+    private ManualWizardStep3 manualStep3;
+    private ManualWizardStep4 manualStep4;
+    private ManualWizardStep5 manualStep5;
+    private ManualWizardStep6 manualStep6;
 
-    private ManualWizardStepLast manualStepLast; //Da haben wir die Tabelle
+    //Die Tabelle
+    private ManualWizardStep7 manualStep7;
 
     //Automated Steps
     private AutomatedWizardStep1 automatedWizardStep1;
@@ -56,14 +57,14 @@ public class WizardMain extends Wizard {
 
         wizardStartPane = new WizardStartPane();
 
-        manualStep1 = new MWS1(parentObject, tree, wizardSelectedObject);
-        manualStep2 = new MWS2(tree, wizardSelectedObject);
-        manualStep3 = new MWS3(tree, wizardSelectedObject);
-        manualStep4 = new MWS4(tree, wizardSelectedObject);
-        manualStep5 = new MWS5(tree, wizardSelectedObject);
-        manualStep6 = new MWS6(tree, wizardSelectedObject);
+        manualStep1 = new ManualWizardStep1(parentObject, tree, wizardSelectedObject);
+        manualStep2 = new ManualWizardStep2(tree, wizardSelectedObject);
+        manualStep3 = new ManualWizardStep3(tree, wizardSelectedObject);
+        manualStep4 = new ManualWizardStep4(tree, wizardSelectedObject);
+        manualStep5 = new ManualWizardStep5(tree, wizardSelectedObject);
+        manualStep6 = new ManualWizardStep6(tree, wizardSelectedObject);
 
-        manualStepLast = new ManualWizardStepLast(tree, wizardSelectedObject);
+        manualStep7 = new ManualWizardStep7(tree, wizardSelectedObject);
 
         automatedWizardStep1 = new AutomatedWizardStep1(parentObject, tree, wizardSelectedObject);
         automatedWizardStep2 = new AutomatedWizardStep2(tree, wizardSelectedObject);
@@ -83,7 +84,7 @@ public class WizardMain extends Wizard {
 
             @Override
             public boolean canAdvance(WizardPane currentPage) {
-                return currentPage != manualStepLast && currentPage != automatedWizardStep2;
+                return currentPage != manualStep7 && currentPage != automatedWizardStep2;
             }
 
             private WizardPane getNext(WizardPane currentPage) {
@@ -108,7 +109,7 @@ public class WizardMain extends Wizard {
                     // On the page ManualWizardStep6
                     return manualStep6;
                 } else if (currentPage.equals(manualStep6)) {
-                    return manualStepLast;
+                    return manualStep7;
                 } else if (currentPage.equals(wizardStartPane) && wizardStartPane.getControl().equals("Automated Wiotech Structure Creation")) {
                     return automatedWizardStep1;
                 } else if (currentPage.equals(automatedWizardStep1)) {

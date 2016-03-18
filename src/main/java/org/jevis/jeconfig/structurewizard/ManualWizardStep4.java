@@ -40,14 +40,14 @@ import org.jevis.jeconfig.tool.ImageConverter;
  * @author Zeyd Bilal Calis
  */
 //In dieser Klasse wird ausgewaehlte Objekt vom ComboBox erzeugt.
-public class MWS6 extends WizardPane {
+public class ManualWizardStep4 extends WizardPane {
 
     private JEVisClass createClass;
     private TextField fileNameTextField;
     private ObjectTree tree;
     private WizardSelectedObject wizardSelectedObject;
 
-    public MWS6(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
+    public ManualWizardStep4(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
         this.wizardSelectedObject = wizardSelectedObject;
         this.tree = tree;
         setMinSize(500, 500);
@@ -71,18 +71,7 @@ public class MWS6 extends WizardPane {
     @Override
     public void onExitingPage(Wizard wizard) {
         //Erzeuge das Objekt
-        //Set new Data Point Directory!
         commitObject();
-        for (int i = 0; i < wizardSelectedObject.getCurrentTemplateObjects().size(); i++) {
-            try {
-                System.out.println(wizardSelectedObject.getCurrentTemplateObjects().get(i).getJEVisClass().getName());
-                if (wizardSelectedObject.getCurrentTemplateObjects().get(i).getJEVisClass().getName().endsWith("Data Point Directory")) {
-                    wizardSelectedObject.setCurrentDataPointDirectory(wizardSelectedObject.getCurrentTemplateObjects().get(i));
-                }
-            } catch (JEVisException ex) {
-                Logger.getLogger(MWS6.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
     }
 
     public void commitObject() {
@@ -97,17 +86,18 @@ public class MWS6 extends WizardPane {
             wizardSelectedObject.setCurrentTemplateObjects(newObject);
 
             //Check ob das neue Objekt Kind hat oder nicht.
-//            if (newObject.getAllowedChildrenClasses().isEmpty()) {
-//                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//                alert.setTitle("Information Dialog");
-//                alert.setHeaderText(null);
-//                alert.setContentText(createClass.getName() + " has no children! \n"
-//                        + ""
-//                        + "Please check your structure!");
-//                alert.showAndWait();
-//            }
+            if (newObject.getAllowedChildrenClasses().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText(createClass.getName() + " has no children! \n"
+                        + ""
+                        + "Please check your structure!");
+                alert.showAndWait();
+            }
+
         } catch (JEVisException ex) {
-            Logger.getLogger(MWS6.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManualWizardStep4.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -119,7 +109,7 @@ public class MWS6 extends WizardPane {
         try {
             options = FXCollections.observableArrayList(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses());
         } catch (JEVisException ex) {
-            Logger.getLogger(MWS6.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManualWizardStep4.class.getName()).log(Level.SEVERE, null, ex);
         }
         // Set the cell properties for ComboBox
         Callback<ListView<JEVisClass>, ListCell<JEVisClass>> cellFactory = new Callback<ListView<JEVisClass>, ListCell<JEVisClass>>() {
@@ -161,7 +151,7 @@ public class MWS6 extends WizardPane {
             fileNameTextField.setPromptText(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses().get(0).getName());
             fileNameTextField.setText(fileNameTextField.getPromptText());
         } catch (JEVisException ex) {
-            Logger.getLogger(MWS3.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManualWizardStep3.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         // Add the children in to the ComboBox
@@ -179,7 +169,7 @@ public class MWS6 extends WizardPane {
                 try {
                     fileNameTextField.setText(classComboBox.getSelectionModel().getSelectedItem().getName());
                 } catch (JEVisException ex) {
-                    Logger.getLogger(MWS3.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ManualWizardStep3.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });

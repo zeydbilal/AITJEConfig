@@ -5,14 +5,8 @@
  */
 package org.jevis.jeconfig.structurewizard;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,47 +14,38 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
-import org.jevis.api.JEVisAttribute;
 import org.jevis.api.JEVisClass;
-import org.jevis.api.JEVisClassRelationship;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.jeconfig.bulkedit.CreateTable;
-import org.jevis.jeconfig.structurewizard.WizardSelectedObject;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
 import org.jevis.jeconfig.tool.ImageConverter;
-import org.joda.time.DateTime;
 
 /**
  *
  * @author Zeyd Bilal Calis
  */
-//In dieser Klasse wird ein Server Objekt erzeugt und seine Attribute werden in die datenbank abgespeichert.
+//In dieser Klasse wird ein Server Objekt erzeugt.
 public class ManualWizardStep2 extends WizardPane {
 
     private JEVisClass createClass;
     private TextField serverNameTextField;
     private ObjectTree tree;
-    private ObservableList<String> typeNames = FXCollections.observableArrayList();
-    private ObservableList<String> listBuildSample = FXCollections.observableArrayList();
     private WizardSelectedObject wizardSelectedObject;
-    private Map<String, String> map = new TreeMap<String, String>();
 
     public ManualWizardStep2(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
         this.wizardSelectedObject = wizardSelectedObject;
@@ -94,51 +79,30 @@ public class ManualWizardStep2 extends WizardPane {
             //Create Server.
             JEVisObject newObject = wizardSelectedObject.getCurrentSelectedObject().buildObject(serverNameTextField.getText(), createClass);
             newObject.commit();
-            //Commit the Attributes
-            commitAttributes(newObject);
 
-            //wähle den Server als neue Objekt aus!
+            //Wähle den Server als neues Objekt aus!
             wizardSelectedObject.setCurrentSelectedObject(newObject);
+            //Speichere Server Objekt in die Liste ab.
+            wizardSelectedObject.setCurrentTemplateObjects(newObject);
 
-        } catch (JEVisException ex) {
-            Logger.getLogger(ManualWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void commitAttributes(JEVisObject newObject) {
-        try {
-            List<JEVisAttribute> attribut = newObject.getAttributes();
-            ObservableList<JEVisAttribute> mylist = FXCollections.observableArrayList(attribut);
-            sortTheChildren(mylist);
-
-            for (Map.Entry<String, String> entrySet : map.entrySet()) {
-                listBuildSample.add(entrySet.getValue());
-            }
-
-            for (int i = 0; i < mylist.size(); i++) {
-                if (!listBuildSample.get(i).isEmpty()) {
-                    mylist.get(i).buildSample(new DateTime(), listBuildSample.get(i)).commit();
-                }
+            //Check ob das neue Objekt Kind hat oder nicht.
+            if (newObject.getAllowedChildrenClasses().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText(createClass.getName() +" has no children! \n"
+                        + ""
+                        + "Please check your structure!");
+                alert.showAndWait();        
             }
 
         } catch (JEVisException ex) {
             Logger.getLogger(ManualWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    public static void sortTheChildren(ObservableList<JEVisAttribute> list) {
-        Comparator<JEVisAttribute> sort = new Comparator<JEVisAttribute>() {
-            @Override
-            public int compare(JEVisAttribute o1, JEVisAttribute o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        };
-        FXCollections.sort(list, sort);
     }
 
     // GUI Elemente
-    private BorderPane getInit() {
-        BorderPane root = new BorderPane();
+    private HBox getInit() {
 
         ObservableList<JEVisClass> options = FXCollections.observableArrayList();
 
@@ -179,150 +143,35 @@ public class ManualWizardStep2 extends WizardPane {
             }
         };
 
-        Label serverName = new Label();
+        Label serverNamelbl = new Label();
         serverNameTextField = new TextField();
         serverNameTextField.setPrefWidth(200);
         serverNameTextField.setPromptText("Server Name");
 
-        // Add the servers in to the ComboBox ComboBox
+        // Add the servers in to the ComboBox
         ComboBox<JEVisClass> classComboBox = new ComboBox<JEVisClass>(options);
         classComboBox.setCellFactory(cellFactory);
         classComboBox.setButtonCell(cellFactory.call(null));
         classComboBox.setMinWidth(250);
         classComboBox.getSelectionModel().selectFirst();
         createClass = classComboBox.getSelectionModel().getSelectedItem();
-        //TODO
-        //FIXME check the structure !
-        /*
-         if(childrenList.size()==0){
-         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-         alert.setTitle("Information Dialog");
-         alert.setHeaderText(null);
-         alert.setContentText("You can not use this server ! \\n Please check your structure!");
-         alert.showAndWait();
-         }
-         */
+
         classComboBox.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                typeNames.clear();
-                map.clear();
-                listBuildSample.clear();
                 createClass = classComboBox.getSelectionModel().getSelectedItem();
-                //TODO
-                //FIXME check the structure !
-                // Get the relations
-//                try {
-//                    List<JEVisClassRelationship> list = createClass.getRelationships();
-//                    for (JEVisClassRelationship list1 : list) {
-//                        System.out.println("--> " + createClass.getName());
-//                        for (int i = 0; i < list1.getJEVisClasses().length; i++) {
-//                            System.out.println(list1.getJEVisClasses()[i].getName());
-//                        }
-//                    }
-//                    /*
-//                     if(childrenList.size()==0){
-//                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//                     alert.setTitle("Information Dialog");
-//                     alert.setHeaderText(null);
-//                     alert.setContentText("You can not use this server ! \\n Please check your structure!");
-//                     alert.showAndWait();
-//                     }
-//                     */
-//                } catch (JEVisException ex) {
-//                    Logger.getLogger(ManualWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-                try {
-                    for (int i = 0; i < createClass.getTypes().size(); i++) {
-                        typeNames.add(createClass.getTypes().get(i).getName());
-                    }
-                } catch (JEVisException ex) {
-                    Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                root.setCenter(getTypes());
+
             }
         });
 
-        //Get and set the typenames from a class. Typenames are for the columnnames.
-        try {
-            for (int i = 0; i < createClass.getTypes().size(); i++) {
-                typeNames.add(createClass.getTypes().get(i).getName());
-            }
-        } catch (JEVisException ex) {
-            Logger.getLogger(CreateTable.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        serverName.setText("Name : ");
+        serverNamelbl.setText("Name : ");
 
         //Servername and ComboBox
-        HBox hBoxTop = new HBox();
-        hBoxTop.setSpacing(10);
-        hBoxTop.getChildren().addAll(serverName, serverNameTextField, classComboBox);
-        hBoxTop.setPadding(new Insets(10, 10, 10, 10));
+        HBox hBox = new HBox();
+        hBox.setSpacing(30);
+        hBox.getChildren().addAll(serverNamelbl, serverNameTextField, classComboBox);
+        hBox.setPadding(new Insets(200, 10, 10, 10));
 
-        root.setTop(hBoxTop);
-        root.setCenter(getTypes());
-
-        return root;
-    }
-
-    //Erzeuge Label,TextField und CheckBox variablen von schon vordefinierten Typen.
-    public GridPane getTypes() {
-        GridPane gridpane = new GridPane();
-
-        for (int i = 0; i < typeNames.size(); i++) {
-            Label label = new Label(typeNames.get(i) + " : ");
-            try {
-                if (createClass.getTypes().get(i).getGUIDisplayType() == null || createClass.getTypes().get(i).getGUIDisplayType().equals("Text")) {
-
-                    TextField textField = new TextField();
-                    textField.setId(createClass.getTypes().get(i).getName());
-                    textField.setPrefWidth(400);
-
-                    map.put(textField.getId(), textField.getText());
-
-                    textField.textProperty().addListener(new ChangeListener<String>() {
-                        @Override
-                        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                            map.put(textField.getId(), textField.getText());
-                        }
-                    });
-                    gridpane.addRow(i, label, textField);
-                } else {
-                    CheckBox checkBox = new CheckBox();
-
-                    checkBox.setId(createClass.getTypes().get(i).getName());
-                    checkBox.setSelected(false);
-
-                    if (checkBox.isSelected() == true) {
-                        map.put(checkBox.getId(), "1");
-                    } else {
-                        map.put(checkBox.getId(), "0");
-                    }
-
-                    map.put(checkBox.getId(), checkBox.getText());
-
-                    checkBox.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            if (checkBox.isSelected() == true) {
-                                map.put(checkBox.getId(), "1");
-                            } else {
-                                map.put(checkBox.getId(), "0");
-                            }
-                        }
-                    });
-
-                    gridpane.addRow(i, label, checkBox);
-                }
-            } catch (JEVisException ex) {
-                Logger.getLogger(ManualWizardStep2.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        gridpane.setHgap(10);//horizontal gap in pixels 
-        gridpane.setVgap(10);//vertical gap in pixels
-        gridpane.setPadding(new Insets(10, 10, 10, 10));////margins around the whole grid
-
-        return gridpane;
+        return hBox;
     }
 }

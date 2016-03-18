@@ -57,7 +57,7 @@ public class ManualWizardStep1 extends WizardPane {
         hbox.getChildren().addAll(namelbl, nameTextField);
         hbox.setPadding(new Insets(200, 10, 10, 20));
 
-        nameTextField.setPromptText("Building here");
+        nameTextField.setPromptText("Building Name");
 
         return hbox;
     }

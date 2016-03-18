@@ -39,15 +39,15 @@ import org.jevis.jeconfig.tool.ImageConverter;
  *
  * @author Zeyd Bilal Calis
  */
-//In dieser Klasse wird ein Server Objekt erzeugt.
-public class MWS2 extends WizardPane {
+//In dieser Klasse wird ausgewaehlte Objekt vom ComboBox erzeugt.
+public class ManualWizardStep6 extends WizardPane {
 
     private JEVisClass createClass;
-    private TextField serverNameTextField;
+    private TextField fileNameTextField;
     private ObjectTree tree;
     private WizardSelectedObject wizardSelectedObject;
 
-    public MWS2(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
+    public ManualWizardStep6(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
         this.wizardSelectedObject = wizardSelectedObject;
         this.tree = tree;
         setMinSize(500, 500);
@@ -70,34 +70,44 @@ public class MWS2 extends WizardPane {
 
     @Override
     public void onExitingPage(Wizard wizard) {
-        //Erzeuge das Server-Objekt
-        commitServerObject();
+        //Erzeuge das Objekt
+        //Set new Data Point Directory!
+        commitObject();
+        for (int i = 0; i < wizardSelectedObject.getCurrentTemplateObjects().size(); i++) {
+            try {
+                System.out.println(wizardSelectedObject.getCurrentTemplateObjects().get(i).getJEVisClass().getName());
+                if (wizardSelectedObject.getCurrentTemplateObjects().get(i).getJEVisClass().getName().endsWith("Data Point Directory")) {
+                    wizardSelectedObject.setCurrentDataPointDirectory(wizardSelectedObject.getCurrentTemplateObjects().get(i));
+                }
+            } catch (JEVisException ex) {
+                Logger.getLogger(ManualWizardStep6.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
-    public void commitServerObject() {
+    public void commitObject() {
         try {
-            //Create Server.
-            JEVisObject newObject = wizardSelectedObject.getCurrentSelectedObject().buildObject(serverNameTextField.getText(), createClass);
+            //Create Object.
+            JEVisObject newObject = wizardSelectedObject.getCurrentSelectedObject().buildObject(fileNameTextField.getText(), createClass);
             newObject.commit();
 
-            //Wähle den Server als neues Objekt aus!
+            //Wähle das neue Objekt als CurrentSelectedObject aus!
             wizardSelectedObject.setCurrentSelectedObject(newObject);
-            //Speichere Server Objekt in die Liste ab.
+            //Speichere das Objekt in die Liste ab.
             wizardSelectedObject.setCurrentTemplateObjects(newObject);
 
             //Check ob das neue Objekt Kind hat oder nicht.
-            if (newObject.getAllowedChildrenClasses().isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Information Dialog");
-                alert.setHeaderText(null);
-                alert.setContentText(createClass.getName() +" has no children! \n"
-                        + ""
-                        + "Please check your structure!");
-                alert.showAndWait();        
-            }
-
+//            if (newObject.getAllowedChildrenClasses().isEmpty()) {
+//                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//                alert.setTitle("Information Dialog");
+//                alert.setHeaderText(null);
+//                alert.setContentText(createClass.getName() + " has no children! \n"
+//                        + ""
+//                        + "Please check your structure!");
+//                alert.showAndWait();
+//            }
         } catch (JEVisException ex) {
-            Logger.getLogger(MWS2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManualWizardStep6.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -109,7 +119,7 @@ public class MWS2 extends WizardPane {
         try {
             options = FXCollections.observableArrayList(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses());
         } catch (JEVisException ex) {
-            Logger.getLogger(MWS2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManualWizardStep6.class.getName()).log(Level.SEVERE, null, ex);
         }
         // Set the cell properties for ComboBox
         Callback<ListView<JEVisClass>, ListCell<JEVisClass>> cellFactory = new Callback<ListView<JEVisClass>, ListCell<JEVisClass>>() {
@@ -143,12 +153,18 @@ public class MWS2 extends WizardPane {
             }
         };
 
-        Label serverNamelbl = new Label();
-        serverNameTextField = new TextField();
-        serverNameTextField.setPrefWidth(200);
-        serverNameTextField.setPromptText("Server Name");
+        Label fileNamelbl = new Label();
+        fileNameTextField = new TextField();
+        fileNameTextField.setPrefWidth(200);
 
-        // Add the servers in to the ComboBox
+        try {
+            fileNameTextField.setPromptText(wizardSelectedObject.getCurrentSelectedObject().getAllowedChildrenClasses().get(0).getName());
+            fileNameTextField.setText(fileNameTextField.getPromptText());
+        } catch (JEVisException ex) {
+            Logger.getLogger(ManualWizardStep3.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        // Add the children in to the ComboBox
         ComboBox<JEVisClass> classComboBox = new ComboBox<JEVisClass>(options);
         classComboBox.setCellFactory(cellFactory);
         classComboBox.setButtonCell(cellFactory.call(null));
@@ -160,16 +176,20 @@ public class MWS2 extends WizardPane {
             @Override
             public void handle(ActionEvent event) {
                 createClass = classComboBox.getSelectionModel().getSelectedItem();
-
+                try {
+                    fileNameTextField.setText(classComboBox.getSelectionModel().getSelectedItem().getName());
+                } catch (JEVisException ex) {
+                    Logger.getLogger(ManualWizardStep3.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
 
-        serverNamelbl.setText("Name : ");
+        fileNamelbl.setText("Name : ");
 
-        //Servername and ComboBox
+        //filename and ComboBox
         HBox hBox = new HBox();
         hBox.setSpacing(30);
-        hBox.getChildren().addAll(serverNamelbl, serverNameTextField, classComboBox);
+        hBox.getChildren().addAll(fileNamelbl, fileNameTextField, classComboBox);
         hBox.setPadding(new Insets(200, 10, 10, 10));
 
         return hBox;

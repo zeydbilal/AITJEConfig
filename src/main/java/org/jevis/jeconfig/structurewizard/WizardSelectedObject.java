@@ -17,6 +17,8 @@ import org.jevis.api.JEVisObject;
 //Die ausgewaehlte Objekte werden in dieser Klasse abgespeichert bzw. gelagert.
 public class WizardSelectedObject {
 
+    //Liste für die Objekte.
+    //Mit hilfe dieser Liste kann mann kontrollieren ob die Objekte erzeugt worden oder nicht. zb DataPointDirectory
     private ObservableList<JEVisObject> currentTemplateObjects = FXCollections.observableArrayList();
 
     // Selected objects from tree

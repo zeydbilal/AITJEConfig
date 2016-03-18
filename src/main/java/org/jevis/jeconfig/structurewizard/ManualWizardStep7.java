@@ -44,7 +44,7 @@ import org.joda.time.DateTime;
  *
  * @author Bilal
  */
-public class ManualWizardStepLast extends WizardPane {
+public class ManualWizardStep7 extends WizardPane {
 
     private final ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
     private ObservableList<SpreadsheetCell> cells;
@@ -60,7 +60,7 @@ public class ManualWizardStepLast extends WizardPane {
     private ObservableList<String> listUnits = FXCollections.observableArrayList();
     private ObservableList<String> listUnitSymbols = FXCollections.observableArrayList();
 
-    public ManualWizardStepLast(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
+    public ManualWizardStep7(ObjectTree tree, WizardSelectedObject wizardSelectedObject) {
         this.wizardSelectedObject = wizardSelectedObject;
         this.tree = tree;
         setMinSize(700, 830);
@@ -167,7 +167,7 @@ public class ManualWizardStepLast extends WizardPane {
                                 JEVisAttribute attributeTarget = newDataPointObject.getAttribute("Target");
                                 attributeTarget.buildSample(new DateTime(), newDataObject.getID()).commit();
                                 
-                                //Value Identifier attribut wurde gelöscht! Value Identifier--> Objectname zb. Data001
+                                //Die neue Version hat 'Value Identifier' attribut nicht! Value Identifier--> Objectname zb. Data001
 //                              JEVisAttribute attributeValueIdentifier = newDataPointObject.getAttribute("Value Identifier");
 //                              attributeValueIdentifier.buildSample(new DateTime(), pair.getValue().get(2)).commit();
 
