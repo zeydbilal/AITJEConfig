@@ -55,7 +55,6 @@ import org.jevis.api.JEVisClass;
 import org.jevis.api.JEVisException;
 import org.jevis.api.JEVisObject;
 import org.jevis.jeconfig.JEConfig;
-import org.jevis.jeconfig.structurewizard.WizardSelectedObject;
 import org.jevis.jeconfig.plugin.object.ObjectTree;
 import org.jevis.jeconfig.tool.ImageConverter;
 

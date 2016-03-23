@@ -38,14 +38,9 @@ public class WizardMain extends Wizard {
 
     //Manual Steps
     private ManualWizardStep1 manualStep1;
-    private ManualWizardStep2 manualStep2;
-    private ManualWizardStep3 manualStep3;
-    private ManualWizardStep4 manualStep4;
-    private ManualWizardStep5 manualStep5;
-    private ManualWizardStep6 manualStep6;
 
     //Die Tabelle
-    private ManualWizardStep7 manualStep7;
+    private ManualWizardStep2 manualStep2;
 
     //Automated Steps
     private AutomatedWizardStep1 automatedWizardStep1;
@@ -59,12 +54,6 @@ public class WizardMain extends Wizard {
 
         manualStep1 = new ManualWizardStep1(parentObject, tree, wizardSelectedObject);
         manualStep2 = new ManualWizardStep2(tree, wizardSelectedObject);
-        manualStep3 = new ManualWizardStep3(tree, wizardSelectedObject);
-        manualStep4 = new ManualWizardStep4(tree, wizardSelectedObject);
-        manualStep5 = new ManualWizardStep5(tree, wizardSelectedObject);
-        manualStep6 = new ManualWizardStep6(tree, wizardSelectedObject);
-
-        manualStep7 = new ManualWizardStep7(tree, wizardSelectedObject);
 
         automatedWizardStep1 = new AutomatedWizardStep1(parentObject, tree, wizardSelectedObject);
         automatedWizardStep2 = new AutomatedWizardStep2(tree, wizardSelectedObject);
@@ -84,7 +73,7 @@ public class WizardMain extends Wizard {
 
             @Override
             public boolean canAdvance(WizardPane currentPage) {
-                return currentPage != manualStep7 && currentPage != automatedWizardStep2;
+                return currentPage != manualStep2 && currentPage != automatedWizardStep2;
             }
 
             private WizardPane getNext(WizardPane currentPage) {
@@ -96,21 +85,7 @@ public class WizardMain extends Wizard {
                 } else if (currentPage.equals(manualStep1)) {
                     // On the page ManualWizardStep2
                     return manualStep2;
-                } else if (currentPage.equals(manualStep2)) {
-                    // On the page ManualWizardStep3
-                    return manualStep3;
-                } else if (currentPage.equals(manualStep3)) {
-                    // On the page ManualWizardStep4
-                    return manualStep4;
-                } else if (currentPage.equals(manualStep4)) {
-                    // On the page ManualWizardStep5
-                    return manualStep5;
-                } else if (currentPage.equals(manualStep5)) {
-                    // On the page ManualWizardStep6
-                    return manualStep6;
-                } else if (currentPage.equals(manualStep6)) {
-                    return manualStep7;
-                } else if (currentPage.equals(wizardStartPane) && wizardStartPane.getControl().equals("Automated Wiotech Structure Creation")) {
+                }else if (currentPage.equals(wizardStartPane) && wizardStartPane.getControl().equals("Automated Wiotech Structure Creation")) {
                     return automatedWizardStep1;
                 } else if (currentPage.equals(automatedWizardStep1)) {
                     return automatedWizardStep2;
